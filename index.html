@@ -1,9 +1,9 @@
-/mode<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Crestline Method — CPG Margin Diagnostic</title>
+<title>Jake's CPG Margin Diagnostic Tool</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
@@ -1085,15 +1085,9 @@ textarea:focus, select:focus, input:focus { box-shadow: none; }
 <!-- ══ SIDEBAR ══════════════════════════════════════════════════ -->
 <aside class="sidebar">
   <div class="logo">
-    <div class="logo-mark">
-      <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M2 13 L5 9 L8 11 L11 6 L14 8 L16 5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-        <circle cx="14" cy="8" r="2" fill="#B91C1C"/>
-      </svg>
-    </div>
     <div class="logo-text">
-      <div class="logo-word">Crestline <span class="logo-ver">v2</span></div>
-      <div class="logo-sub">CPG Margin Diagnostic</div>
+      <div class="logo-word">Jake's CPG Margin <span class="logo-ver">v2</span></div>
+      <div class="logo-sub">Diagnostic Tool</div>
     </div>
   </div>
   <nav class="nav">
@@ -1122,7 +1116,7 @@ textarea:focus, select:focus, input:focus { box-shadow: none; }
     </div>
   </nav>
   <div class="sidebar-footer">
-    <p>v2.0 · Checks: 10 live<br>Next: +8 Phase 1 checks<br>Crestline Method © 2025</p>
+    <p>v2.0 · Checks: 10 live<br>Next: +8 Phase 1 checks<br>jakeherridge.com © 2025</p>
   </div>
 </aside>
 
@@ -1181,7 +1175,7 @@ textarea:focus, select:focus, input:focus { box-shadow: none; }
     <div class="card-header">
       <div class="step cyan">1</div>
       <div class="card-title">Sales Data — CSV Upload or Paste</div>
-      <div class="card-desc">Luminate export, Retail Link, or Crestline practice dataset</div>
+      <div class="card-desc">Luminate export, Retail Link, or sample practice dataset</div>
     </div>
     <div class="card-body">
       <div class="drop-zone" id="dropZone">
@@ -1191,10 +1185,10 @@ textarea:focus, select:focus, input:focus { box-shadow: none; }
         <div class="drop-sub">or click to browse · .csv · .txt</div>
       </div>
       <div class="or-line">OR PASTE</div>
-      <textarea id="csvPaste" rows="5" placeholder="Paste CSV text here (include header row)…&#10;&#10;Tip: Save the Crestline Weekly Sales sheet as CSV and drop it above."></textarea>
+      <textarea id="csvPaste" rows="5" placeholder="Paste CSV text here (include header row)…&#10;&#10;Tip: Save your Weekly Sales sheet as CSV and drop it above."></textarea>
       <div class="btn-row">
         <button class="btn btn-primary" onclick="loadData()">→ Load & Auto-Map</button>
-        <button class="btn btn-ghost" onclick="loadSample()">Load Crestline Sample</button>
+        <button class="btn btn-ghost" onclick="loadSample()">Load Sample Data</button>
       </div>
       <div id="previewArea" style="display:none;margin-top:16px;">
         <div class="preview-wrap"><table class="preview-tbl" id="previewTbl"></table></div>
@@ -1911,14 +1905,14 @@ function buildJBP(){
     <div class="jbp-header">
       <div class="jbp-logo">Confidential — Joint Business Plan Briefing Document</div>
       <div class="jbp-title">Channel Performance & Growth Opportunity Review</div>
-      <div class="jbp-meta">Walmart Channel · Generated ${date} · Crestline Method Diagnostic v2.0</div>
+      <div class="jbp-meta">Walmart Channel · Generated ${date} · CPG Margin Diagnostic v2.0</div>
     </div>
     <div class="jbp-body">
 
       <div class="jbp-section">
         <div class="jbp-section-title">Executive Summary</div>
         <p style="font-size:12px;color:var(--muted2);line-height:1.8;">This analysis covers <strong style="color:var(--text)">${lastResults.rows.toLocaleString()} weeks of POS data</strong> representing <strong style="color:var(--text)">${fmt$(totRev)}</strong> in channel revenue at a portfolio gross margin of <strong style="color:var(--text)">${fmtPct(gmpct)}</strong>. The diagnostic identified <strong style="color:var(--red)">${fires.length} critical areas</strong> and <strong style="color:var(--amber)">${warns.length} items for joint review</strong>. Total estimated recoverable gross profit through identified opportunities: <strong style="color:var(--amber)">${fmt$(totOpp)}</strong>.</p>
-        ${hasHistory?`<p style="font-size:11px;color:var(--muted2);margin-top:10px;font-style:italic;">Note: This briefing is supported by ${snaps.length} weeks of historical trend data maintained in the Crestline data custody layer. This historical dataset is independently maintained and provides continuity beyond Luminate's rolling data windows.</p>`:''}
+        ${hasHistory?`<p style="font-size:11px;color:var(--muted2);margin-top:10px;font-style:italic;">Note: This briefing is supported by ${snaps.length} weeks of historical trend data maintained in the diagnostic data custody layer. This historical dataset is independently maintained and provides continuity beyond Luminate's rolling data windows.</p>`:''}
       </div>`;
 
   // DSS Migration callout
@@ -1990,7 +1984,7 @@ window.showView=function(id){
 // SAMPLE DATA
 // ═══════════════════════════════════════════════════════════════════
 function loadSample(){
-  loading('Generating Crestline sample data…');
+  loading('Generating sample data…');
   setTimeout(()=>{
     const skus=[
       {s:'CLF-001',n:'Original Trail Mix 8oz',seg:'Trail Mix',msrp:4.98,cost:2.10,vel:14,osa:97},
