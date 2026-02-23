@@ -1,0 +1,2129 @@
+/mode<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crestline Method — CPG Margin Diagnostic</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+/* ── TOKENS ─────────────────────────────────────────────────── */
+:root {
+  /* ── PAGE & SURFACE ──────────────────────────── */
+  --page:       #F7F7F5;
+  --white:      #FFFFFF;
+  --sidebar:    #FFFFFF;
+  /* ── NAVY / PRIMARY ──────────────────────────── */
+  --navy:       #152035;
+  --navy-mid:   #1E3050;
+  --navy-light: #EEF1F6;
+  /* ── STATUS: CRITICAL ────────────────────────── */
+  --coral:      #B91C1C;
+  --coral-bg:   #FEF2F2;
+  --coral-mid:  rgba(185,28,28,0.12);
+  /* ── STATUS: POSITIVE ────────────────────────── */
+  --teal:       #15623E;
+  --teal-bg:    #F0FAF4;
+  --teal-mid:   rgba(21,98,62,0.12);
+  /* ── STATUS: WARNING ─────────────────────────── */
+  --amber:      #92400E;
+  --amber-bg:   #FFF8F0;
+  --amber-mid:  rgba(146,64,14,0.12);
+  /* ── NEUTRAL (was lavender/phantom) ─────────── */
+  --lav:        #374151;
+  --lav-bg:     #F3F4F6;
+  --lav-mid:    rgba(55,65,81,0.12);
+  /* ── INK / TEXT ──────────────────────────────── */
+  --ink:        #111827;
+  --ink-mid:    #374151;
+  --muted:      #6B7280;
+  --muted-lt:   #9CA3AF;
+  /* ── BORDERS ─────────────────────────────────── */
+  --border:     #E5E7EB;
+  --border-lt:  #F3F4F6;
+  /* ── SHADOWS ─────────────────────────────────── */
+  --shadow-sm:  0 1px 2px rgba(17,24,39,0.06);
+  --shadow-md:  0 3px 8px rgba(17,24,39,0.08);
+  --shadow-lg:  0 6px 16px rgba(17,24,39,0.10);
+  /* ── BORDER RADIUS ───────────────────────────── */
+  --r:          3px;
+  --r-sm:       2px;
+  --r-lg:       4px;
+  /* ── TYPOGRAPHY ──────────────────────────────── */
+  --serif:      'Libre Baskerville', Georgia, serif;
+  --sans:       'Inter', system-ui, sans-serif;
+  /* ── ORPHANED TOKENS (used in JS-generated HTML) */
+  --red:        #B91C1C;
+  --green:      #15623E;
+  --green-dim:  #F0FAF4;
+  --cyan:       #152035;
+  --muted2:     #6B7280;
+  --text:       #111827;
+  --mono:       'Inter', monospace;
+}
+
+/* ── RESET ───────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--page);
+  color: var(--ink);
+  font-family: var(--sans);
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── LAYOUT ──────────────────────────────────────────────────── */
+.app { display: grid; grid-template-columns: 230px 1fr; min-height: 100vh; }
+
+/* ── SIDEBAR ─────────────────────────────────────────────────── */
+.sidebar {
+  background: var(--sidebar);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+/* ── LOGO ────────────────────────────────────────────────────── */
+.logo {
+  padding: 24px 22px 22px;
+  border-bottom: 1px solid var(--border-lt);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.logo-mark {
+  width: 34px;
+  height: 34px;
+  background: var(--navy);
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.logo-text { flex: 1; }
+.logo-word {
+  font-family: var(--serif);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--navy);
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.logo-ver {
+  font-family: var(--sans);
+  font-size: 9px;
+  font-weight: 600;
+  background: var(--coral);
+  color: white;
+  padding: 1px 5px;
+  border-radius: 3px;
+  letter-spacing: 0.03em;
+  vertical-align: middle;
+}
+.logo-sub {
+  font-family: var(--sans);
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 0.02em;
+  margin-top: 2px;
+}
+
+/* ── NAV ─────────────────────────────────────────────────────── */
+.nav { padding: 14px 0; flex: 1; }
+.nav-section {
+  padding: 8px 20px 4px;
+  font-family: var(--sans);
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--muted-lt);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 20px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--muted);
+  transition: all 0.15s;
+  border-left: 2px solid transparent;
+  user-select: none;
+  margin: 1px 0;
+}
+.nav-item:hover { color: var(--navy); background: var(--navy-light); }
+.nav-item.active {
+  color: var(--navy);
+  font-weight: 600;
+  border-left-color: var(--navy);
+  background: var(--navy-light);
+}
+.nav-icon {
+  width: 18px;
+  text-align: center;
+  font-size: 12px;
+  opacity: 0.7;
+}
+.nav-badge {
+  margin-left: auto;
+  font-family: var(--sans);
+  font-size: 9px;
+  font-weight: 600;
+  background: var(--border-lt);
+  color: var(--muted);
+  padding: 2px 6px;
+  border-radius: 10px;
+  letter-spacing: 0.02em;
+}
+.nav-badge.live { background: var(--teal-bg); color: var(--teal); }
+.nav-badge.new  { background: var(--coral-bg); color: var(--coral); }
+
+.sidebar-footer {
+  padding: 16px 20px;
+  border-top: 1px solid var(--border-lt);
+}
+.sidebar-footer p {
+  font-size: 10px;
+  color: var(--muted-lt);
+  line-height: 1.7;
+}
+
+/* ── MAIN ────────────────────────────────────────────────────── */
+.main { overflow-y: auto; min-height: 100vh; }
+.view { display: none; padding: 40px 44px 80px; }
+.view.active { display: block; }
+
+/* ── PAGE HEADER ─────────────────────────────────────────────── */
+.page-header { margin-bottom: 32px; }
+.page-eyebrow {
+  font-family: var(--sans);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--coral);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.page-eyebrow::before {
+  content: '';
+  display: inline-block;
+  width: 18px;
+  height: 2px;
+  background: var(--coral);
+  border-radius: 2px;
+}
+.page-title {
+  font-family: var(--serif);
+  font-size: clamp(26px, 2.8vw, 38px);
+  font-weight: 700;
+  font-style: italic;
+  color: var(--navy);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  margin-bottom: 8px;
+}
+.page-desc {
+  font-size: 13px;
+  color: var(--muted);
+  max-width: 600px;
+  line-height: 1.65;
+}
+
+/* ── CARDS ───────────────────────────────────────────────────── */
+.card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-lt);
+}
+.card-title {
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  flex: 1;
+}
+.card-body { padding: 22px; }
+.card-desc {
+  font-size: 11px;
+  color: var(--muted-lt);
+  margin-left: auto;
+  text-align: right;
+}
+
+/* ── STEP BADGE ──────────────────────────────────────────────── */
+.step {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.step.cyan   { background: var(--navy); color: white; }
+.step.amber  { background: var(--amber); color: white; }
+.step.green  { background: var(--teal); color: white; }
+.step.purple { background: var(--lav); color: white; }
+.step.dim    { background: var(--border-lt); color: var(--muted); border: 1px solid var(--border); }
+
+/* ── FORMS ───────────────────────────────────────────────────── */
+.drop-zone {
+  border: 2px dashed var(--border);
+  border-radius: var(--r);
+  padding: 36px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  background: var(--page);
+}
+.drop-zone:hover, .drop-zone.over {
+  border-color: var(--navy);
+  background: var(--navy-light);
+}
+.drop-zone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.drop-icon { font-size: 26px; margin-bottom: 8px; opacity: 0.4; }
+.drop-title { font-size: 14px; font-weight: 600; color: var(--ink-mid); margin-bottom: 4px; }
+.drop-sub { font-size: 11px; color: var(--muted); }
+
+textarea, select, input[type="text"], input[type="number"] {
+  background: var(--white);
+  border: 1px solid var(--border);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 12px;
+  padding: 10px 12px;
+  border-radius: var(--r-sm);
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  width: 100%;
+}
+textarea:focus, select:focus, input:focus {
+  border-color: var(--navy);
+  box-shadow: 0 0 0 3px rgba(27,43,75,0.08);
+}
+textarea::placeholder { color: var(--muted-lt); }
+select option { background: white; }
+label {
+  font-family: var(--sans);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.or-line {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--muted-lt);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin: 18px 0;
+}
+.or-line::before, .or-line::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border-lt);
+}
+
+/* ── BUTTONS ─────────────────────────────────────────────────── */
+.btn {
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 10px 22px;
+  border-radius: var(--r-sm);
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  letter-spacing: 0.01em;
+}
+.btn-primary { background: var(--navy); color: white; box-shadow: var(--shadow-sm); }
+.btn-primary:hover { background: var(--navy-mid); box-shadow: var(--shadow-md); transform: translateY(-1px); }
+.btn-amber  { background: var(--amber); color: white; box-shadow: var(--shadow-sm); }
+.btn-amber:hover { filter: brightness(1.08); transform: translateY(-1px); }
+.btn-ghost  { background: var(--white); color: var(--ink-mid); border: 1px solid var(--border); box-shadow: var(--shadow-sm); }
+.btn-ghost:hover { border-color: var(--navy); color: var(--navy); }
+.btn-green  { background: var(--teal); color: white; }
+.btn-green:hover { filter: brightness(1.08); }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; }
+.btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+
+/* ── MAPPER ──────────────────────────────────────────────────── */
+.mapper-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 8px; margin-top: 12px; }
+.mapper-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--page);
+  border: 1px solid var(--border-lt);
+  border-radius: var(--r-sm);
+  padding: 8px 10px;
+}
+.mapper-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--navy);
+  flex: 0 0 115px;
+  letter-spacing: 0.02em;
+}
+.mapper-arrow { color: var(--muted-lt); font-size: 11px; }
+.dot { width: 7px; height: 7px; border-radius: 50%; background: var(--border); flex-shrink: 0; }
+.dot.auto { background: var(--navy); }
+.dot.ok   { background: var(--teal); }
+
+/* ── SUMMARY BAR ─────────────────────────────────────────────── */
+.summary-bar {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  margin-bottom: 28px;
+}
+.stat-box {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 20px 18px;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+}
+.stat-box::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+}
+.stat-box:nth-child(1)::before { background: var(--navy); }
+.stat-box:nth-child(2)::before { background: var(--teal); }
+.stat-box:nth-child(3)::before { background: var(--coral); }
+.stat-box:nth-child(4)::before { background: var(--amber); }
+.stat-box:nth-child(5)::before { background: var(--amber); }
+.stat-val {
+  font-family: var(--serif);
+  font-size: clamp(22px, 2.2vw, 30px);
+  font-weight: 600;
+  font-style: italic;
+  line-height: 1;
+  margin-bottom: 6px;
+  letter-spacing: -0.02em;
+}
+.stat-val.cyan   { color: var(--navy); }
+.stat-val.green  { color: var(--teal); }
+.stat-val.red    { color: var(--coral); }
+.stat-val.amber  { color: var(--amber); }
+.stat-val.purple { color: var(--lav); }
+.stat-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* ── DIAGNOSTIC CARDS ────────────────────────────────────────── */
+.diag-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+  gap: 14px;
+}
+.diag-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.2s;
+}
+.diag-card:hover { box-shadow: var(--shadow-md); }
+.diag-card.fire  { border-color: rgba(224,90,66,0.3); }
+.diag-card.warn  { border-color: rgba(200,146,42,0.3); }
+.diag-card.ok    { border-color: rgba(10,152,128,0.2); }
+.diag-card.phantom { border-color: rgba(107,93,184,0.3); }
+
+/* colored left accent bar via head border */
+.diag-card.fire .diag-head   { border-left: 3px solid var(--coral); }
+.diag-card.warn .diag-head   { border-left: 3px solid var(--amber); }
+.diag-card.ok .diag-head     { border-left: 3px solid var(--teal); }
+.diag-card.phantom .diag-head { border-left: 3px solid var(--lav); }
+
+.diag-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border-lt);
+}
+/* colored left bar on each card head */
+.diag-card.fire   .diag-head { border-left: 3px solid var(--coral); }
+.diag-card.warn   .diag-head { border-left: 3px solid var(--amber); }
+.diag-card.ok     .diag-head { border-left: 3px solid var(--teal); }
+.diag-card.phantom .diag-head { border-left: 3px solid var(--lav); }
+
+.status-pip {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.pip-fire   { background: var(--coral); }
+.pip-warn   { background: var(--amber); }
+.pip-ok     { background: var(--teal); }
+.pip-purple { background: var(--lav); }
+
+.diag-id {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--muted-lt);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.diag-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink);
+  flex: 1;
+}
+.diag-opp {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+.opp-fire   { background: var(--coral-bg); color: var(--coral); }
+.opp-warn   { background: var(--amber-bg); color: var(--amber); }
+.opp-ok     { background: var(--teal-bg);  color: var(--teal); }
+.opp-purple { background: var(--lav-bg);   color: var(--lav); }
+
+.diag-body { padding: 16px 18px; }
+.diag-finding {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.65;
+  margin-bottom: 14px;
+}
+.diag-finding strong { color: var(--ink); font-weight: 600; }
+.diag-metrics { display: flex; gap: 18px; flex-wrap: wrap; }
+.metric {
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--muted-lt);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.metric span {
+  font-family: var(--serif);
+  font-size: 16px;
+  font-weight: 600;
+  font-style: italic;
+  color: var(--ink);
+  display: block;
+  margin-top: 3px;
+  letter-spacing: -0.01em;
+}
+.metric span.r { color: var(--coral); }
+.metric span.a { color: var(--amber); }
+.metric span.g { color: var(--teal); }
+.metric span.c { color: var(--navy); }
+.metric span.p { color: var(--lav); }
+
+/* ── OTIF PANEL ──────────────────────────────────────────────── */
+.otif-panel {
+  background: var(--page);
+  border: 1px solid var(--border-lt);
+  border-radius: var(--r);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+.otif-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-top: 14px; }
+.otif-input-wrap { display: flex; flex-direction: column; gap: 5px; }
+.otif-result {
+  background: var(--coral-bg);
+  border: 1px solid rgba(224,90,66,0.2);
+  border-radius: var(--r-sm);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 16px;
+}
+.otif-result-label { font-size: 10px; font-weight: 600; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; }
+.otif-result-val { font-family: var(--serif); font-size: 32px; font-style: italic; font-weight: 700; color: var(--coral); letter-spacing: -0.02em; }
+
+/* ── LADDER ──────────────────────────────────────────────────── */
+.ladder { margin-top: 8px; }
+.ladder-item { display: flex; align-items: center; gap: 16px; padding: 10px 0; border-bottom: 1px solid var(--border-lt); }
+.ladder-item:last-child { border-bottom: none; }
+.ladder-rank { font-family: var(--serif); font-size: 13px; font-style: italic; color: var(--muted-lt); width: 20px; text-align: right; flex-shrink: 0; }
+.ladder-wrap { flex: 1; }
+.ladder-lbl { font-size: 12px; font-weight: 600; color: var(--ink); margin-bottom: 5px; display: flex; justify-content: space-between; }
+.ladder-lbl span { font-size: 9px; font-weight: 600; color: var(--muted-lt); letter-spacing: 0.06em; text-transform: uppercase; align-self: center; }
+.ladder-track { height: 5px; background: var(--border-lt); border-radius: 3px; overflow: hidden; }
+.ladder-fill { height: 100%; border-radius: 3px; transition: width 1.2s cubic-bezier(0.22,1,0.36,1); }
+.ladder-val { font-family: var(--serif); font-size: 14px; font-weight: 600; font-style: italic; width: 80px; text-align: right; flex-shrink: 0; }
+.ladder-total { display: flex; align-items: center; justify-content: space-between; padding: 14px 0 0; border-top: 2px solid var(--border); margin-top: 8px; }
+.ladder-total-label { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+.ladder-total-val { font-family: var(--serif); font-size: 28px; font-style: italic; font-weight: 700; color: var(--amber); letter-spacing: -0.02em; }
+
+/* ── JBP PANEL ───────────────────────────────────────────────── */
+.jbp-panel {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+.jbp-header {
+  background: var(--navy);
+  padding: 28px 32px;
+  border-bottom: none;
+  position: relative;
+  overflow: hidden;
+}
+.jbp-header::after {
+  content: 'JBP';
+  position: absolute;
+  right: 28px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: var(--serif);
+  font-size: 80px;
+  font-style: italic;
+  font-weight: 700;
+  color: rgba(255,255,255,0.06);
+  letter-spacing: -0.04em;
+  pointer-events: none;
+  line-height: 1;
+}
+.jbp-logo {
+  font-size: 9px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.45);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.jbp-title {
+  font-family: var(--serif);
+  font-size: 28px;
+  font-style: italic;
+  font-weight: 700;
+  color: white;
+  letter-spacing: -0.02em;
+  margin-bottom: 6px;
+}
+.jbp-meta { font-size: 11px; color: rgba(255,255,255,0.55); }
+.jbp-body { padding: 32px; }
+.jbp-section { margin-bottom: 28px; }
+.jbp-section-title {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--muted-lt);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-lt);
+}
+.jbp-finding {
+  background: var(--page);
+  border-radius: var(--r-sm);
+  padding: 16px 18px;
+  margin-bottom: 10px;
+  border-left: 3px solid var(--border);
+}
+.jbp-finding.fire { border-left-color: var(--coral); background: var(--coral-bg); }
+.jbp-finding.warn { border-left-color: var(--amber); background: var(--amber-bg); }
+.jbp-finding.ok   { border-left-color: var(--teal);  background: var(--teal-bg); }
+.jbp-finding-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.jbp-finding-name { font-size: 13px; font-weight: 700; color: var(--ink); }
+.jbp-finding-opp  { font-family: var(--serif); font-size: 13px; font-style: italic; font-weight: 600; color: var(--amber); }
+.jbp-finding-text { font-size: 12px; color: var(--muted); line-height: 1.7; }
+.jbp-commitment { display: flex; gap: 14px; padding: 13px 0; border-bottom: 1px solid var(--border-lt); }
+.jbp-commitment:last-child { border-bottom: none; }
+.jbp-commit-num { font-family: var(--serif); font-size: 18px; font-style: italic; font-weight: 700; color: var(--navy); flex-shrink: 0; width: 24px; line-height: 1.3; }
+.jbp-commit-body {}
+.jbp-commit-title { font-size: 13px; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+.jbp-commit-text  { font-size: 12px; color: var(--muted); line-height: 1.65; }
+.jbp-dss-box {
+  background: var(--amber-bg);
+  border: 1px solid rgba(200,146,42,0.2);
+  border-radius: var(--r-sm);
+  padding: 16px 18px;
+}
+.jbp-dss-title { font-size: 9px; font-weight: 700; color: var(--amber); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 6px; }
+.jbp-dss-text  { font-size: 12px; color: var(--ink-mid); line-height: 1.65; }
+
+/* ── TREND MEMORY ────────────────────────────────────────────── */
+.trend-empty {
+  text-align: center; padding: 64px 20px; color: var(--muted);
+}
+.trend-empty-icon { font-size: 36px; margin-bottom: 12px; opacity: 0.3; }
+.trend-empty-title { font-family: var(--serif); font-size: 18px; font-style: italic; font-weight: 600; color: var(--ink-mid); margin-bottom: 6px; }
+.trend-empty-sub { font-size: 12px; line-height: 1.7; max-width: 400px; margin: 0 auto; }
+
+.snapshots-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px; }
+.snapshot-row {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: var(--shadow-sm);
+}
+.snap-date { font-family: var(--serif); font-size: 12px; font-style: italic; font-weight: 600; color: var(--navy); flex: 0 0 100px; }
+.snap-stats { display: flex; gap: 24px; flex: 1; }
+.snap-stat { font-size: 10px; font-weight: 600; color: var(--muted-lt); letter-spacing: 0.04em; text-transform: uppercase; }
+.snap-stat span { font-family: var(--serif); font-size: 15px; font-style: italic; font-weight: 600; color: var(--ink); display: block; margin-top: 1px; letter-spacing: -0.01em; }
+.snap-delta { font-size: 11px; font-weight: 600; }
+.snap-delta.up   { color: var(--teal); }
+.snap-delta.dn   { color: var(--coral); }
+.snap-delta.flat { color: var(--muted-lt); }
+.snap-del { font-size: 9px; color: var(--muted-lt); cursor: pointer; padding: 3px 7px; border: 1px solid var(--border); border-radius: 3px; background: transparent; transition: all 0.15s; }
+.snap-del:hover { color: var(--coral); border-color: var(--coral); }
+
+.trend-chart {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 22px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow-sm);
+}
+.trend-chart-title { font-size: 10px; font-weight: 700; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 18px; }
+.mini-chart { display: flex; align-items: flex-end; gap: 6px; height: 80px; }
+.mini-bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.mini-bar { width: 100%; border-radius: 3px 3px 0 0; transition: height 0.6s ease; min-height: 3px; }
+.mini-bar-label { font-size: 8px; font-weight: 500; color: var(--muted-lt); writing-mode: vertical-rl; transform: rotate(180deg); }
+
+.trend-delta-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; }
+.trend-delta-box {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 16px;
+  box-shadow: var(--shadow-sm);
+}
+.trend-delta-label { font-size: 9px; font-weight: 700; color: var(--muted-lt); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 6px; }
+.trend-delta-val { font-family: var(--serif); font-size: 22px; font-style: italic; font-weight: 700; color: var(--ink); letter-spacing: -0.02em; }
+.trend-delta-val.up { color: var(--teal); }
+.trend-delta-val.dn { color: var(--coral); }
+.trend-delta-sub { font-size: 10px; font-weight: 600; margin-top: 3px; }
+
+/* ── PREVIEW TABLE ───────────────────────────────────────────── */
+.preview-wrap { overflow-x: auto; border: 1px solid var(--border-lt); border-radius: var(--r-sm); margin-top: 14px; }
+.preview-tbl { width: 100%; border-collapse: collapse; font-size: 11px; }
+.preview-tbl th {
+  background: var(--page);
+  color: var(--navy);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 9px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+.preview-tbl td { padding: 7px 12px; border-bottom: 1px solid var(--border-lt); color: var(--muted); white-space: nowrap; }
+.preview-tbl tr:last-child td { border-bottom: none; }
+.preview-tbl tr:hover td { background: var(--navy-light); color: var(--navy); }
+.row-count { font-size: 10px; color: var(--muted-lt); margin-top: 6px; font-weight: 500; }
+
+/* ── TOGGLE ──────────────────────────────────────────────────── */
+.toggle-row {
+  display: flex;
+  gap: 0;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  overflow: hidden;
+  width: fit-content;
+  margin-bottom: 22px;
+  box-shadow: var(--shadow-sm);
+}
+.toggle-btn {
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 8px 18px;
+  cursor: pointer;
+  color: var(--muted);
+  background: transparent;
+  border: none;
+  transition: all 0.15s;
+  letter-spacing: 0.03em;
+}
+.toggle-btn.active { background: var(--navy); color: white; }
+
+/* ── LOADING ─────────────────────────────────────────────────── */
+.loading-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(244,243,240,0.88);
+  z-index: 10000;
+  align-items: center; justify-content: center; flex-direction: column; gap: 16px;
+  backdrop-filter: blur(4px);
+}
+.loading-overlay.on { display: flex; }
+.spinner {
+  width: 36px; height: 36px;
+  border: 2px solid var(--border);
+  border-top-color: var(--navy);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-txt { font-size: 12px; font-weight: 600; color: var(--muted); letter-spacing: 0.04em; }
+
+/* ── TOAST ───────────────────────────────────────────────────── */
+.toast {
+  position: fixed; bottom: 24px; right: 24px;
+  background: var(--ink);
+  color: white;
+  border-radius: var(--r-sm);
+  padding: 10px 18px;
+  font-size: 12px; font-weight: 500;
+  z-index: 20000;
+  transform: translateY(60px); opacity: 0;
+  transition: all 0.25s;
+  max-width: 320px;
+  box-shadow: var(--shadow-lg);
+}
+.toast.on  { transform: translateY(0); opacity: 1; }
+.toast.ok  { background: var(--teal); }
+.toast.err { background: var(--coral); }
+
+/* ── ANIMATIONS ──────────────────────────────────────────────── */
+.fade-up { opacity: 0; transform: translateY(8px); animation: fadeUp 0.35s ease forwards; }
+@keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+.d1{animation-delay:0.04s} .d2{animation-delay:0.08s} .d3{animation-delay:0.12s}
+.d4{animation-delay:0.16s} .d5{animation-delay:0.20s} .d6{animation-delay:0.24s}
+.d7{animation-delay:0.28s} .d8{animation-delay:0.32s} .d9{animation-delay:0.36s}
+.d10{animation-delay:0.40s} .d11{animation-delay:0.44s}
+
+/* ── RESPONSIVE ──────────────────────────────────────────────── */
+@media(max-width:900px){
+  .app{grid-template-columns:1fr}
+  .sidebar{display:none}
+  .summary-bar{grid-template-columns:repeat(2,1fr)}
+  .diag-grid{grid-template-columns:1fr}
+  .otif-grid{grid-template-columns:1fr}
+  .trend-delta-grid{grid-template-columns:repeat(2,1fr)}
+}
+
+/* ── C-SUITE OVERRIDES ──────────────────────────────────────── */
+
+/* Body kerning */
+body { font-feature-settings: "kern" 1; }
+
+/* Logo — tighter radius, neutral version badge */
+.logo-mark { border-radius: 3px; }
+.logo-ver  { background: var(--border); color: var(--muted); border-radius: 2px; }
+
+/* Nav badge NEW — no longer coral/alarm */
+.nav-badge.new { background: var(--border-lt); color: var(--muted); }
+
+/* Eyebrow — navy accent, not coral */
+.page-eyebrow         { color: var(--navy); }
+.page-eyebrow::before { background: var(--navy); }
+
+/* Page title — Libre Baskerville but upright (no italic), slightly tighter */
+.page-title {
+  font-style:    normal;
+  font-size:     clamp(22px, 2.4vw, 32px);
+  letter-spacing: -0.01em;
+}
+
+/* Stat box — 2px accent bar, Inter tabular nums, no italic */
+.stat-box::before { height: 2px; }
+.stat-val {
+  font-family:         var(--sans);
+  font-style:          normal;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+/* Diagnostic card accent bars — 2px, cleaner */
+.diag-card.fire   .diag-head,
+.diag-card.warn   .diag-head,
+.diag-card.ok     .diag-head,
+.diag-card.phantom .diag-head { border-left-width: 2px; }
+
+/* Metric values — Inter, no italic, tabular */
+.metric span {
+  font-family:          var(--sans);
+  font-style:           normal;
+  font-size:            15px;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+/* OTIF result value */
+.otif-result-val {
+  font-family:          var(--sans);
+  font-style:           normal;
+  font-size:            28px;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+  letter-spacing:       -0.01em;
+}
+
+/* Ladder — Inter, no italic, tabular */
+.ladder-rank {
+  font-family: var(--sans);
+  font-style:  normal;
+  font-size:   12px;
+  font-weight: 500;
+}
+.ladder-val {
+  font-family:          var(--sans);
+  font-style:           normal;
+  font-size:            13px;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+.ladder-total-val {
+  font-family:          var(--sans);
+  font-style:           normal;
+  font-size:            24px;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+  letter-spacing:       -0.01em;
+}
+
+/* JBP — remove watermark, upright titles */
+.jbp-header::after { content: none; }
+.jbp-title         { font-style: normal; font-size: 24px; }
+.jbp-commit-num {
+  font-family: var(--sans);
+  font-style:  normal;
+  font-size:   16px;
+}
+.jbp-finding-opp {
+  font-family:          var(--sans);
+  font-style:           normal;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+/* Trend memory — Inter, upright, tabular */
+.trend-empty-title { font-family: var(--sans); font-style: normal; }
+.snap-date         { font-family: var(--sans); font-style: normal; }
+.snap-stat span {
+  font-family:          var(--sans);
+  font-style:           normal;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+.trend-delta-val {
+  font-family:          var(--sans);
+  font-style:           normal;
+  font-size:            20px;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+  letter-spacing:       -0.01em;
+}
+
+/* Buttons — no lift on hover */
+.btn-primary:hover,
+.btn-amber:hover,
+.btn-ghost:hover,
+.btn-green:hover { transform: none; }
+
+/* Form inputs — no glow ring */
+textarea:focus, select:focus, input:focus { box-shadow: none; }
+
+/* Loading overlay — match new page color */
+.loading-overlay { background: rgba(247,247,245,0.92); }
+
+/* Animations — no movement, minimal stagger */
+.fade-up {
+  transform:          none;
+  animation-duration: 0.15s;
+}
+@keyframes fadeUp { to { opacity: 1; transform: none; } }
+.d1,.d2,.d3,.d4,.d5,.d6,.d7,.d8,.d9,.d10,.d11 { animation-delay: 0s; }
+
+/* ── EVIDENCE PANEL ──────────────────────────────────────────── */
+.evidence-backdrop {
+  display: none; position: fixed; inset: 0;
+  background: rgba(17,24,39,0.28); z-index: 900;
+}
+.evidence-backdrop.open { display: block; }
+
+.evidence-panel {
+  position: fixed; top: 0; right: -520px; width: 520px;
+  height: 100vh; background: var(--white);
+  border-left: 1px solid var(--border);
+  box-shadow: -4px 0 24px rgba(17,24,39,0.10);
+  z-index: 901; display: flex; flex-direction: column;
+  transition: right 0.22s ease; overflow: hidden;
+}
+.evidence-panel.open { right: 0; }
+
+.ev-header {
+  padding: 20px 22px 18px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: flex-start; gap: 12px; flex-shrink: 0;
+}
+.ev-header-info { flex: 1; min-width: 0; }
+.ev-check-id {
+  font-size: 9px; font-weight: 600; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--muted); margin-bottom: 4px;
+}
+.ev-check-name {
+  font-family: var(--serif); font-size: 16px; font-weight: 700;
+  color: var(--navy); line-height: 1.25;
+}
+.ev-close {
+  width: 28px; height: 28px; border: 1px solid var(--border);
+  border-radius: var(--r-sm); background: var(--white); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; color: var(--muted); flex-shrink: 0;
+  transition: all 0.15s;
+}
+.ev-close:hover { background: var(--border-lt); color: var(--ink); }
+
+.ev-finding {
+  padding: 14px 22px; background: var(--page);
+  border-bottom: 1px solid var(--border); flex-shrink: 0;
+  font-size: 12px; line-height: 1.65; color: var(--ink-mid);
+}
+
+.ev-table-wrap { flex: 1; overflow-y: auto; }
+.ev-section-label {
+  padding: 12px 22px 8px; font-size: 9px; font-weight: 600;
+  letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);
+  background: var(--white); border-bottom: 1px solid var(--border-lt);
+  position: sticky; top: 0;
+}
+.ev-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+.ev-table th {
+  padding: 8px 14px; text-align: left; font-size: 9px; font-weight: 600;
+  letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted);
+  background: var(--page); border-bottom: 1px solid var(--border);
+  position: sticky; top: 33px; white-space: nowrap;
+}
+.ev-table th:not(:first-child) { text-align: right; }
+.ev-table td {
+  padding: 9px 14px; border-bottom: 1px solid var(--border-lt);
+  color: var(--ink); font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+.ev-table td:not(:first-child) { text-align: right; font-weight: 500; }
+.ev-table tr:last-child td { border-bottom: none; }
+.ev-table tr:hover td { background: var(--navy-light); }
+.ev-table .ev-fire { color: var(--coral); font-weight: 600; }
+.ev-table .ev-warn { color: var(--amber); font-weight: 600; }
+.ev-table .ev-ok   { color: var(--teal);  font-weight: 600; }
+
+.ev-footer {
+  padding: 12px 22px; border-top: 1px solid var(--border); flex-shrink: 0;
+  font-size: 10px; color: var(--muted); display: flex;
+  align-items: center; justify-content: space-between;
+}
+.ev-empty {
+  padding: 40px 22px; text-align: center;
+  font-size: 12px; color: var(--muted); line-height: 1.7;
+}
+.diag-card { cursor: pointer; }
+.diag-card:hover .diag-head { opacity: 0.85; }
+.ev-hint {
+  font-size: 10px; color: var(--muted-lt); font-weight: 400;
+  margin-left: auto; padding-left: 8px; flex-shrink: 0;
+  letter-spacing: 0.02em; pointer-events: none;
+}
+</style>
+</head>
+<body>
+
+<div class="loading-overlay" id="loader">
+  <div class="spinner"></div>
+  <div class="loading-txt" id="loaderTxt">Processing…</div>
+</div>
+<div class="toast" id="toast"></div>
+
+<div class="app">
+
+<!-- ══ SIDEBAR ══════════════════════════════════════════════════ -->
+<aside class="sidebar">
+  <div class="logo">
+    <div class="logo-mark">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M2 13 L5 9 L8 11 L11 6 L14 8 L16 5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="14" cy="8" r="2" fill="#B91C1C"/>
+      </svg>
+    </div>
+    <div class="logo-text">
+      <div class="logo-word">Crestline <span class="logo-ver">v2</span></div>
+      <div class="logo-sub">CPG Margin Diagnostic</div>
+    </div>
+  </div>
+  <nav class="nav">
+    <div class="nav-section">Setup</div>
+    <div class="nav-item active" onclick="showView('data')" id="nav-data">
+      <span class="nav-icon">⬆</span> Load Data
+      <span class="nav-badge" id="badge-data">Step 1</span>
+    </div>
+    <div class="nav-item" onclick="showView('map')" id="nav-map">
+      <span class="nav-icon">⇄</span> Map Columns
+      <span class="nav-badge" id="badge-map">—</span>
+    </div>
+    <div class="nav-section" style="margin-top:8px;">Analysis</div>
+    <div class="nav-item" onclick="showView('diagnostic')" id="nav-diagnostic">
+      <span class="nav-icon">◎</span> Diagnostic
+      <span class="nav-badge" id="badge-diag">9+1</span>
+    </div>
+    <div class="nav-item" onclick="showView('trend')" id="nav-trend">
+      <span class="nav-icon">↗</span> Trend Memory
+      <span class="nav-badge new" id="badge-trend">NEW</span>
+    </div>
+    <div class="nav-section" style="margin-top:8px;">Output</div>
+    <div class="nav-item" onclick="showView('jbp')" id="nav-jbp">
+      <span class="nav-icon">◻</span> JBP Report
+      <span class="nav-badge new">NEW</span>
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <p>v2.0 · Checks: 10 live<br>Next: +8 Phase 1 checks<br>Crestline Method © 2025</p>
+  </div>
+</aside>
+
+<!-- ══ VIEWS ════════════════════════════════════════════════════ -->
+<main class="main">
+
+<!-- ── VIEW: DATA LOAD ────────────────────────────────────────── -->
+<section class="view active" id="view-data">
+  <div class="page-header">
+    <div class="page-eyebrow">Step 1 — Data Ingestion</div>
+    <div class="page-title">Load Your Data</div>
+    <div class="page-desc">Drop a CSV export from Luminate, Retail Link, or any system — or paste directly. The column mapper auto-detects your fields next.</div>
+  </div>
+
+  <!-- OTIF PRE-RUN INPUTS -->
+  <div class="card" style="margin-bottom:20px;">
+    <div class="card-header">
+      <div class="step amber">✦</div>
+      <div class="card-title">OTIF Chargeback Calculator</div>
+      <div class="card-desc">New in v2 — runs independently of CSV data</div>
+    </div>
+    <div class="card-body">
+      <p style="font-size:12px;color:var(--muted2);margin-bottom:14px;">Walmart charges a <strong style="color:var(--red)">3% chargeback on PO value</strong> for OTIF failures. Enter your numbers to see your current exposure — no CSV required.</p>
+      <div class="otif-panel">
+        <div class="otif-grid">
+          <div class="otif-input-wrap">
+            <label>Annual PO Volume ($)</label>
+            <input type="number" id="otifPO" placeholder="e.g. 8000000" oninput="calcOTIF()">
+          </div>
+          <div class="otif-input-wrap">
+            <label>Current OTIF % (your score)</label>
+            <input type="number" id="otifScore" placeholder="e.g. 94.5" min="0" max="100" oninput="calcOTIF()">
+          </div>
+          <div class="otif-input-wrap">
+            <label>Target OTIF % (Walmart expects 98%)</label>
+            <input type="number" id="otifTarget" placeholder="98" min="0" max="100" value="98" oninput="calcOTIF()">
+          </div>
+        </div>
+        <div class="otif-result" id="otifResult" style="display:none;">
+          <div>
+            <div class="otif-result-label">CURRENT ANNUAL CHARGEBACK EXPOSURE</div>
+            <div style="font-family:var(--mono);font-size:10px;color:var(--muted2);margin-top:3px;" id="otifSub"></div>
+          </div>
+          <div class="otif-result-val" id="otifVal"></div>
+        </div>
+        <div id="otifImprove" style="display:none;margin-top:8px;background:var(--green-dim);border:1px solid rgba(21,98,62,0.2);border-radius:3px;padding:12px 16px;">
+          <div style="font-family:var(--mono);font-size:9px;color:var(--green);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:4px;">Value of Reaching Target OTIF</div>
+          <div style="font-size:12px;color:var(--muted2);" id="otifImproveTxt"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CSV UPLOAD -->
+  <div class="card" style="margin-bottom:20px;">
+    <div class="card-header">
+      <div class="step cyan">1</div>
+      <div class="card-title">Sales Data — CSV Upload or Paste</div>
+      <div class="card-desc">Luminate export, Retail Link, or Crestline practice dataset</div>
+    </div>
+    <div class="card-body">
+      <div class="drop-zone" id="dropZone">
+        <input type="file" id="fileInput" accept=".csv,.txt">
+        <div class="drop-icon">↑</div>
+        <div class="drop-title">Drop CSV here</div>
+        <div class="drop-sub">or click to browse · .csv · .txt</div>
+      </div>
+      <div class="or-line">OR PASTE</div>
+      <textarea id="csvPaste" rows="5" placeholder="Paste CSV text here (include header row)…&#10;&#10;Tip: Save the Crestline Weekly Sales sheet as CSV and drop it above."></textarea>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="loadData()">→ Load & Auto-Map</button>
+        <button class="btn btn-ghost" onclick="loadSample()">Load Crestline Sample</button>
+      </div>
+      <div id="previewArea" style="display:none;margin-top:16px;">
+        <div class="preview-wrap"><table class="preview-tbl" id="previewTbl"></table></div>
+        <div class="row-count" id="rowCount"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── VIEW: COLUMN MAP ───────────────────────────────────────── -->
+<section class="view" id="view-map">
+  <div class="page-header">
+    <div class="page-eyebrow">Step 2 — Column Mapping</div>
+    <div class="page-title">Map Your Fields</div>
+    <div class="page-desc">Auto-detected from 80+ known aliases. Review and correct anything the engine missed — then run the diagnostic.</div>
+  </div>
+  <div class="card">
+    <div class="card-header">
+      <div class="step cyan">2</div>
+      <div class="card-title">Field Mapping</div>
+      <div style="margin-left:auto;font-family:var(--mono);font-size:9px;color:var(--muted2);">
+        <span style="color:var(--cyan)">●</span> Auto &nbsp; <span style="color:var(--green)">●</span> Confirmed &nbsp; <span style="color:var(--muted)">●</span> Unmapped
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="mapper-grid" id="mapperGrid"></div>
+      <div class="btn-row" style="margin-top:20px;">
+        <button class="btn btn-primary" onclick="runDiagnostic()">→ Run Full Diagnostic</button>
+        <button class="btn btn-ghost" onclick="showView('data')">← Back</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── VIEW: DIAGNOSTIC ───────────────────────────────────────── -->
+<section class="view" id="view-diagnostic">
+  <div class="page-header">
+    <div class="page-eyebrow">Step 3 — Audit Results</div>
+    <div class="page-title">Margin Diagnostic</div>
+    <div class="page-desc" id="diagMeta">Run the diagnostic to see results.</div>
+  </div>
+
+  <div class="summary-bar" id="summaryBar" style="display:none;"></div>
+
+  <div class="toggle-row" id="viewToggle" style="display:none;">
+    <button class="toggle-btn active" onclick="setDiagView('cards')">Card View</button>
+    <button class="toggle-btn" onclick="setDiagView('ladder')">Opportunity Ladder</button>
+  </div>
+
+  <div id="diagCards" class="diag-grid"></div>
+  <div id="diagLadder" style="display:none;">
+    <div class="card">
+      <div class="card-header"><div class="card-title">Opportunity Ladder — Ranked by Estimated GP Impact</div></div>
+      <div class="card-body"><div class="ladder" id="ladderBody"></div></div>
+      <div style="padding:16px 20px;border-top:1px solid var(--border);display:flex;gap:10px;flex-wrap:wrap;">
+        <span style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-right:auto;align-self:center;">EXPORT</span>
+        <button class="btn btn-ghost" onclick="exportCSV()">↓ CSV Report</button>
+        <button class="btn btn-ghost" onclick="saveSnapshot()">⊕ Save to Trend Memory</button>
+        <button class="btn btn-amber" onclick="showView('jbp')">→ Generate JBP Report</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="btn-row" id="diagActions" style="display:none;margin-top:20px;">
+    <button class="btn btn-ghost" onclick="exportCSV()">↓ Export CSV</button>
+    <button class="btn btn-ghost" onclick="saveSnapshot()">⊕ Save Snapshot</button>
+    <button class="btn btn-amber" onclick="showView('jbp')">→ Generate JBP Report</button>
+  </div>
+</section>
+
+<!-- ── VIEW: TREND MEMORY ─────────────────────────────────────── -->
+<section class="view" id="view-trend">
+  <div class="page-header">
+    <div class="page-eyebrow">New in v2 — Trend Memory</div>
+    <div class="page-title">Historical Snapshots</div>
+    <div class="page-desc">Every saved diagnostic becomes a data point. After 4+ snapshots, the engine surfaces week-over-week trends — the institutional memory Luminate doesn't keep.</div>
+  </div>
+  <div id="trendContent"></div>
+</section>
+
+<!-- ── VIEW: JBP REPORT ───────────────────────────────────────── -->
+<section class="view" id="view-jbp">
+  <div class="page-header">
+    <div class="page-eyebrow">New in v2 — JBP Output Mode</div>
+    <div class="page-title">Joint Business Plan Report</div>
+    <div class="page-desc">Buyer-facing language. Run the diagnostic first, then generate this to turn audit findings into a JBP-ready narrative your client can hand directly to their Walmart buyer.</div>
+  </div>
+  <div id="jbpContent">
+    <div class="card">
+      <div class="card-body" style="text-align:center;padding:60px 20px;">
+        <div style="font-size:36px;margin-bottom:12px;">◻</div>
+        <div style="font-size:15px;font-weight:500;margin-bottom:6px;">No diagnostic results yet</div>
+        <div style="font-size:12px;color:var(--muted2);margin-bottom:20px;">Load data and run the diagnostic first, then return here to generate the JBP report.</div>
+        <button class="btn btn-primary" onclick="showView('data')">→ Go Load Data</button>
+      </div>
+    </div>
+  </div>
+  <div class="btn-row" id="jbpActions" style="display:none;margin-top:20px;">
+    <button class="btn btn-ghost" onclick="copyJBP()">⎘ Copy Full Report</button>
+    <button class="btn btn-ghost" onclick="window.print()">⎙ Print / PDF</button>
+  </div>
+</section>
+
+</main>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════════
+let parsedData=[], columns=[], colMap={};
+let lastResults=null;
+const STORAGE_KEY='crestline_v2_snapshots';
+
+// ═══════════════════════════════════════════════════════════════════
+// NAV
+// ═══════════════════════════════════════════════════════════════════
+function showView(id){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('view-'+id).classList.add('active');
+  document.getElementById('nav-'+id)?.classList.add('active');
+  if(id==='trend') renderTrend();
+}
+
+function setDiagView(mode){
+  document.querySelectorAll('.toggle-btn').forEach(b=>b.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('diagCards').style.display = mode==='cards'?'grid':'none';
+  document.getElementById('diagLadder').style.display = mode==='ladder'?'block':'none';
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// OTIF CALCULATOR
+// ═══════════════════════════════════════════════════════════════════
+function calcOTIF(){
+  const po=parseFloat(document.getElementById('otifPO').value)||0;
+  const score=parseFloat(document.getElementById('otifScore').value)||0;
+  const target=parseFloat(document.getElementById('otifTarget').value)||98;
+  if(!po||!score){document.getElementById('otifResult').style.display='none';document.getElementById('otifImprove').style.display='none';return;}
+  // 3% chargeback on POs that miss OTIF
+  const missRate=(100-score)/100;
+  const chargeRate=0.03;
+  const exposure=po*missRate*chargeRate;
+  const targetMissRate=(100-target)/100;
+  const targetExposure=po*targetMissRate*chargeRate;
+  const improvement=exposure-targetExposure;
+  document.getElementById('otifResult').style.display='flex';
+  document.getElementById('otifVal').textContent=fmt$(exposure);
+  document.getElementById('otifSub').textContent=`At ${score}% OTIF on ${fmt$(po)} PO volume · ${((100-score)).toFixed(1)}% miss rate × 3% chargeback`;
+  if(improvement>0){
+    document.getElementById('otifImprove').style.display='block';
+    document.getElementById('otifImproveTxt').textContent=`Improving from ${score}% to ${target}% OTIF would recover ${fmt$(improvement)}/year in chargeback penalties. At your current miss rate, you are paying Walmart ${fmt$(exposure)} annually in OTIF chargebacks.`;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// FIELD ALIASES
+// ═══════════════════════════════════════════════════════════════════
+const ALIASES={
+  sku:['sku','item','item_id','product_id','upc','item_number'],
+  product_name:['product_name','name','description','item_description','product'],
+  segment:['segment','category','dept','department','product_type','type','class'],
+  region:['region','territory','area','geography','market','district'],
+  week:['week','date','week_date','period','week_ending','week_end'],
+  units_sold:['units_sold','units','qty','quantity','volume','sales_units'],
+  revenue:['revenue','sales','net_sales','dollar_sales','gross_sales','sales_dollars','total_revenue'],
+  cogs:['cogs','cost','cost_of_goods','cost_of_goods_sold','total_cost'],
+  gross_profit:['gross_profit','gp','margin_dollars','gross_margin_dollars','profit'],
+  gross_margin_pct:['gross_margin_pct','gm_pct','margin_pct','gross_margin_%'],
+  msrp:['msrp','list_price','retail_price','suggested_price','srp'],
+  avg_selling_price:['avg_selling_price','asp','avg_price','selling_price','average_price','price'],
+  on_shelf_availability_pct:['on_shelf_availability_pct','osa','osa_pct','on_shelf_avail','availability','in_stock_pct'],
+  num_stores:['num_stores','stores','store_count','number_of_stores','doors'],
+  promo_flag:['promo_flag','promo','promotion','is_promo','promo_week'],
+  is_holiday_week:['is_holiday_week','holiday','is_holiday','holiday_flag','holiday_week'],
+};
+const LABELS={
+  sku:'SKU / Item ID', product_name:'Product Name', segment:'Segment',
+  region:'Region', week:'Week / Date', units_sold:'Units Sold',
+  revenue:'Revenue ($)', cogs:'COGS ($)', gross_profit:'Gross Profit ($)',
+  gross_margin_pct:'Gross Margin %', msrp:'MSRP ($)', avg_selling_price:'Avg Selling Price',
+  on_shelf_availability_pct:'On-Shelf Availability %', num_stores:'Store Count',
+  promo_flag:'Promo Flag', is_holiday_week:'Holiday Week Flag',
+};
+
+// ═══════════════════════════════════════════════════════════════════
+// CSV PARSING
+// ═══════════════════════════════════════════════════════════════════
+function parseCSV(txt){
+  const lines=txt.trim().split('\n');
+  if(lines.length<2)return null;
+  const hdrs=lines[0].split(',').map(h=>h.trim().replace(/^"|"$/g,''));
+  const rows=[];
+  for(let i=1;i<lines.length;i++){
+    const v=splitCSV(lines[i]);
+    if(!v.length||v.every(x=>x===''))continue;
+    const r={};hdrs.forEach((h,j)=>r[h]=(v[j]||'').trim().replace(/^"|"$/g,''));
+    rows.push(r);
+  }
+  return{headers:hdrs,rows};
+}
+function splitCSV(l){
+  const r=[];let c='',q=false;
+  for(const ch of l){if(ch==='"'){q=!q;}else if(ch===','&&!q){r.push(c);c='';}else c+=ch;}
+  r.push(c);return r;
+}
+function autoMap(hdrs){
+  const map={};
+  const norm=h=>h.toLowerCase().replace(/[\s\-\.]/g,'_').replace(/[^a-z0-9_%]/g,'');
+  const nl=hdrs.map(norm);
+  for(const[field,aliases]of Object.entries(ALIASES)){
+    for(const alias of aliases){
+      const idx=nl.indexOf(norm(alias));
+      if(idx>=0){map[field]=hdrs[idx];break;}
+    }
+  }
+  return map;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// LOAD
+// ═══════════════════════════════════════════════════════════════════
+function loadData(){
+  const fi=document.getElementById('fileInput');
+  const paste=document.getElementById('csvPaste').value.trim();
+  if(fi.files.length>0){const r=new FileReader();r.onload=e=>process(e.target.result);r.readAsText(fi.files[0]);}
+  else if(paste){process(paste);}
+  else{toast('Paste data or select a CSV file first.','err');}
+}
+function process(txt){
+  loading('Parsing…');
+  setTimeout(()=>{
+    try{
+      const res=parseCSV(txt);
+      if(!res||res.rows.length<2){loading(false);toast('Could not parse. Check format.','err');return;}
+      parsedData=res.rows;columns=res.headers;colMap=autoMap(columns);
+      showPreview(res.headers,res.rows.slice(0,5));
+      buildMapper();
+      document.getElementById('badge-data').textContent='✓';
+      document.getElementById('badge-data').className='nav-badge live';
+      document.getElementById('badge-map').textContent=Object.keys(colMap).length+' mapped';
+      loading(false);
+      toast(`${res.rows.length.toLocaleString()} rows · ${Object.keys(colMap).length} fields auto-mapped`,'ok');
+      showView('map');
+    }catch(e){loading(false);toast('Parse error: '+e.message,'err');}
+  },30);
+}
+function showPreview(hdrs,rows){
+  const a=document.getElementById('previewArea');a.style.display='block';
+  let html='<thead><tr>'+hdrs.map(h=>`<th>${h}</th>`).join('')+'</tr></thead><tbody>';
+  rows.forEach(r=>{html+='<tr>'+hdrs.map(h=>`<td>${(r[h]||'').slice(0,18)}</td>`).join('')+'</tr>';});
+  html+='</tbody>';
+  document.getElementById('previewTbl').innerHTML=html;
+  document.getElementById('rowCount').textContent=`${parsedData.length.toLocaleString()} rows · showing first 5`;
+}
+function buildMapper(){
+  const g=document.getElementById('mapperGrid');g.innerHTML='';
+  for(const[f,l]of Object.entries(LABELS)){
+    const m=colMap[f];
+    const opts=`<option value="">— not mapped —</option>`+columns.map(h=>`<option value="${h}"${h===m?' selected':''}>${h}</option>`).join('');
+    const d=document.createElement('div');d.className='mapper-row';
+    d.innerHTML=`<div class="dot${m?' auto':''}" id="dot_${f}"></div><span class="mapper-label">${l}</span><span class="mapper-arrow">→</span><select id="map_${f}" onchange="dotUpdate('${f}')">${opts}</select>`;
+    g.appendChild(d);
+  }
+}
+function dotUpdate(f){
+  const v=document.getElementById('map_'+f).value;
+  const d=document.getElementById('dot_'+f);
+  d.className='dot'+(v?' ok':'');
+  colMap[f]=v||undefined;
+}
+function getMap(){
+  const m={};
+  for(const f of Object.keys(LABELS)){const s=document.getElementById('map_'+f);if(s&&s.value)m[f]=s.value;}
+  return m;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════════════════
+function gn(row,f,m){const c=m[f];if(!c)return null;const v=parseFloat((row[c]||'').replace(/[$,%]/g,''));return isNaN(v)?null:v;}
+function gs(row,f,m){const c=m[f];if(!c)return'';return(row[c]||'').trim();}
+function by(rows,fn){return rows.reduce((a,r)=>{const k=fn(r);(a[k]=a[k]||[]).push(r);return a;},{})}
+function sum(rows,f,m){return rows.reduce((s,r)=>s+(gn(r,f,m)||0),0);}
+function avg(rows,f,m){const v=rows.map(r=>gn(r,f,m)).filter(x=>x!==null);return v.length?v.reduce((a,b)=>a+b)/v.length:null;}
+function fmt$(n){if(n>=1e6)return'$'+(n/1e6).toFixed(2)+'M';if(n>=1e3)return'$'+(n/1e3).toFixed(1)+'K';return'$'+n.toFixed(0);}
+function fmtPct(n){return n.toFixed(1)+'%';}
+function iso(d){return new Date(d).toISOString().split('T')[0];}
+
+// ═══════════════════════════════════════════════════════════════════
+// THE 10 CHECKS
+// ═══════════════════════════════════════════════════════════════════
+function runChecks(rows,m){
+  const totRev=sum(rows,'revenue',m);
+  const totGP=sum(rows,'gross_profit',m);
+  const totU=sum(rows,'units_sold',m);
+  const gmpct=totRev>0?totGP/totRev*100:35;
+  const res=[];
+
+  // D1 — OOS TAX
+  res.push((()=>{
+    const col=m.on_shelf_availability_pct;
+    if(!col){const est=totRev*0.075;return{id:'D1',name:'The OOS Tax',status:'warn',finding:`OSA data not mapped. Industry avg OOS is <strong>7–8%</strong>. Applied 7.5% fallback.`,opp:est,metrics:[{l:'EST. LOST REV',v:fmt$(est),c:'a'},{l:'SOURCE',v:'Industry avg',c:''}]};}
+    const grps=by(rows,r=>gs(r,'sku',m)+'|'+gs(r,'region',m));
+    let bad=[],totLost=0;
+    for(const[k,g]of Object.entries(grps)){
+      const a=avg(g,'on_shelf_availability_pct',m);
+      if(a!==null&&a<90){const lr=sum(g,'revenue',m)*((100-a)/a);totLost+=lr*gmpct/100;bad.push({k,a,lr});}
+    }
+    bad.sort((a,b)=>b.lr-a.lr);
+    const osaAvg=avg(rows,'on_shelf_availability_pct',m)||95;
+    const st=osaAvg<92?'fire':osaAvg<96?'warn':'ok';
+    return{id:'D1',name:'The OOS Tax',status:st,
+      finding:bad.length?`Avg OSA: <strong>${fmtPct(osaAvg)}</strong>. <strong>${bad.length}</strong> SKU×Region combos below 90%. Worst: <strong>${bad[0].k.replace('|',' / ')}</strong> at ${fmtPct(bad[0].a)}.`:`Avg OSA <strong>${fmtPct(osaAvg)}</strong> — healthy. ${bad.length} combos below 90%.`,
+      opp:totLost,metrics:[{l:'AVG OSA',v:fmtPct(osaAvg),c:osaAvg<92?'r':osaAvg<96?'a':'g'},{l:'COMBOS <90%',v:bad.length,c:bad.length>3?'r':'a'},{l:'EST. LOST GP',v:fmt$(totLost),c:totLost>totGP*0.05?'r':'a'}],
+      evidence:bad.length?{cols:['SKU × Region','Avg OSA %','Est. Lost GP'],rows:bad.map(x=>[x.k.replace('|',' / '),fmtPct(x.a),fmt$(x.lr*gmpct/100),x.a<86?'ev-fire':'ev-warn']),note:'All combos below 90% OSA threshold — sorted by GP impact'}:null};
+  })());
+
+  // D2 — PROMO WITHOUT LIFT
+  res.push((()=>{
+    const pc=m.promo_flag;
+    if(!pc){const e=totRev*0.03;return{id:'D2',name:'Promo Without Lift',status:'warn',finding:`Promo flag not mapped. Est. 3% revenue in zero-lift events.`,opp:e,metrics:[{l:'DATA',v:'Missing',c:'a'}]};}
+    const bsku=by(rows,r=>gs(r,'sku',m));let bad=[],opp=0,totPromo=0;
+    for(const[sku,g]of Object.entries(bsku)){
+      const pr=g.filter(r=>{const v=gs(r,'promo_flag',m).toUpperCase();return v==='Y'||v==='TRUE'||v==='1';});
+      const br=g.filter(r=>{const v=gs(r,'promo_flag',m).toUpperCase();return v==='N'||v==='FALSE'||v==='0'||v===''||v==='NO';});
+      if(pr.length<2||br.length<2)continue;
+      const pu=avg(pr,'units_sold',m)||0,bu=avg(br,'units_sold',m)||0;
+      const lift=bu>0?(pu-bu)/bu*100:0;
+      const pp=avg(pr,'avg_selling_price',m),bp=avg(br,'avg_selling_price',m);
+      const depth=(pp&&bp&&bp>0)?(bp-pp)/bp*100:0;
+      const pr_rev=sum(pr,'revenue',m);totPromo+=pr_rev;
+      if(lift<8&&depth>5){const mg=pr_rev*(depth/100)*0.4;opp+=mg;bad.push({sku,lift,depth,mg});}
+    }
+    bad.sort((a,b)=>b.mg-a.mg);
+    const st=bad.length>=3?'fire':bad.length>=1?'warn':'ok';
+    return{id:'D2',name:'Promo Without Lift',status:st,
+      finding:bad.length?`<strong>${bad.length} SKU(s)</strong> discounting with <8% unit lift. Worst: <strong>${bad[0].sku}</strong> — ${fmtPct(bad[0].depth)} discount, ${fmtPct(bad[0].lift)} lift. Pure margin give-up.`:`All promoted SKUs showing meaningful lift above discount threshold.`,
+      opp,metrics:[{l:'ZERO-LIFT SKUS',v:bad.length,c:bad.length>2?'r':bad.length>0?'a':'g'},{l:'MARGIN LOST',v:fmt$(opp),c:opp>0?'a':'g'},{l:'PROMO REV',v:fmt$(totPromo),c:'c'}],
+      evidence:bad.length?{cols:['SKU','Discount Depth','Unit Lift','Margin Waste'],rows:bad.map(x=>[x.sku,fmtPct(x.depth),fmtPct(x.lift),fmt$(x.mg),x.lift<4?'ev-fire':'ev-warn']),note:'Promotions with <8% unit lift — sorted by margin waste'}:null};
+  })());
+
+  // D3 — HERO UNDER-DIST
+  res.push((()=>{
+    const bsku=by(rows,r=>gs(r,'sku',m));
+    let heroSku='',heroRev=0;
+    for(const[s,g]of Object.entries(bsku)){const r=sum(g,'revenue',m);if(r>heroRev){heroRev=r;heroSku=s;}}
+    const heroRows=bsku[heroSku]||[];
+    const byReg=by(heroRows,r=>gs(r,'region',m));
+    const vels={};
+    for(const[reg,g]of Object.entries(byReg)){
+      const r=sum(g,'revenue',m);const s=avg(g,'num_stores',m)||1;const w=new Set(g.map(r=>gs(r,'week',m))).size||1;
+      vels[reg]=r/s/w;
+    }
+    const vals=Object.values(vels);const avgV=vals.reduce((a,b)=>a+b,0)/vals.length;
+    let opp=0;const gaps=[];
+    for(const[reg,vel]of Object.entries(vels)){
+      if(vel<avgV*0.75){const g=byReg[reg]||[];const s=avg(g,'num_stores',m)||1;const w=new Set(g.map(r=>gs(r,'week',m))).size||1;const gap=(avgV-vel)*s*w;opp+=gap*gmpct/100;gaps.push({reg,vel,gap});}
+    }
+    gaps.sort((a,b)=>b.gap-a.gap);
+    const st=gaps.length>=2?'fire':gaps.length===1?'warn':'ok';
+    const d3evRows=Object.entries(vels).sort((a,b)=>b[1]-a[1]).map(([reg,vel])=>{
+      const diff=avgV>0?(vel-avgV)/avgV*100:0;
+      const g2=byReg[reg]||[];const s2=avg(g2,'num_stores',m)||1;const w2=new Set(g2.map(r=>gs(r,'week',m))).size||1;
+      const gap2=(avgV-vel)*s2*w2;
+      const cls=vel<avgV*0.75?'ev-fire':vel<avgV*0.9?'ev-warn':'ev-ok';
+      return[reg,(diff>=0?'+':'')+diff.toFixed(1)+'%','$'+vel.toFixed(2),gap2>0?fmt$(gap2*gmpct/100):'—',cls];
+    });
+    return{id:'D3',name:'Hero SKU Under-Distributed',status:st,
+      finding:gaps.length?`Hero SKU <strong>${heroSku}</strong>: <strong>${gaps.length} region(s)</strong> >25% below avg velocity. <strong>${gaps[0].reg}</strong> is the biggest gap.`:`Hero SKU <strong>${heroSku}</strong> shows consistent velocity across all regions.`,
+      opp,metrics:[{l:'HERO SKU',v:heroSku,c:'c'},{l:'UNDER-PERF REGIONS',v:gaps.length,c:gaps.length>1?'r':gaps.length>0?'a':'g'},{l:'GP UPSIDE',v:fmt$(opp),c:opp>0?'a':'g'}],
+      evidence:{cols:['Region','vs Portfolio Avg','Velocity $/store/wk','GP Gap'],rows:d3evRows,note:`Hero SKU: ${heroSku} — portfolio avg $${avgV.toFixed(2)}/store/wk`}};
+  })());
+
+  // D4 — MIX SHIFT
+  res.push((()=>{
+    if(!m.week){const e=totGP*0.02;return{id:'D4',name:'Mix Shift — Lower-Margin Items',status:'warn',finding:`Week column not mapped. Cannot trend margin mix.`,opp:e,metrics:[{l:'DATA',v:'Needs Week Col',c:'a'}]};}
+    const sw=[...new Set(rows.map(r=>gs(r,'week',m)))].sort();const mid=sw[Math.floor(sw.length/2)];
+    const h1=rows.filter(r=>gs(r,'week',m)<=mid),h2=rows.filter(r=>gs(r,'week',m)>mid);
+    const g1=sum(h1,'gross_profit',m),r1=sum(h1,'revenue',m);
+    const g2=sum(h2,'gross_profit',m),r2=sum(h2,'revenue',m);
+    const p1=r1>0?g1/r1*100:0,p2=r2>0?g2/r2*100:0;const drift=p1-p2;
+    const opp=drift>0.5?r2*drift/100:0;
+    const st=drift>1.5?'fire':drift>0.5?'warn':'ok';
+    return{id:'D4',name:'Mix Shift — Lower-Margin Items',status:st,
+      finding:drift>0.3?`Gross margin drifted <strong>${fmtPct(drift)}</strong> lower in recent periods (${fmtPct(p2)} vs ${fmtPct(p1)} earlier). Revenue growing while margin dollars erode.`:`Gross margin stable (${fmtPct(p1)} → ${fmtPct(p2)}). No significant mix shift.`,
+      opp,metrics:[{l:'EARLY GM%',v:fmtPct(p1),c:'c'},{l:'RECENT GM%',v:fmtPct(p2),c:p2<p1-1?'r':'g'},{l:'DRIFT',v:(drift>0?'-':'+')+Math.abs(drift).toFixed(1)+'%',c:drift>1?'r':drift>0.3?'a':'g'}],
+      evidence:{cols:['Period','Margin %','Revenue','Gross Profit'],rows:[['Early half (H1)',fmtPct(p1),fmt$(r1),fmt$(g1),'ev-ok'],['Recent half (H2)',fmtPct(p2),fmt$(r2),fmt$(g2),drift>1.5?'ev-fire':drift>0.5?'ev-warn':'ev-ok']],note:'Split at dataset midpoint — margin trend H1 vs H2'}};
+  })());
+
+  // D5 — DISCOUNT DEPTH
+  res.push((()=>{
+    if(!m.promo_flag||!m.avg_selling_price){const e=totRev*0.015;return{id:'D5',name:'Promo Discount Too Deep',status:'warn',finding:`Need promo flag + avg selling price to calculate discount ROI.`,opp:e,metrics:[{l:'DATA',v:'Missing',c:'a'}]};}
+    const bsku=by(rows,r=>gs(r,'sku',m));let bad=[],opp=0;
+    for(const[sku,g]of Object.entries(bsku)){
+      const pr=g.filter(r=>{const v=gs(r,'promo_flag',m).toUpperCase();return v==='Y'||v==='TRUE'||v==='1';});
+      const br=g.filter(r=>{const v=gs(r,'promo_flag',m).toUpperCase();return v==='N'||v==='FALSE'||v==='0'||v===''||v==='NO';});
+      if(!pr.length||!br.length)continue;
+      const pp=avg(pr,'avg_selling_price',m),bp=avg(br,'avg_selling_price',m)||avg(g,'msrp',m);
+      if(!pp||!bp||bp===0)continue;
+      const depth=(bp-pp)/bp*100;const pu=avg(pr,'units_sold',m)||0,bu=avg(br,'units_sold',m)||0;
+      const lift=bu>0?(pu-bu)/bu*100:0;
+      if(depth>18&&lift<depth*0.8){const wm=sum(pr,'revenue',m)*(depth/100)*0.4;opp+=wm;bad.push({sku,depth,lift,wm});}
+    }
+    bad.sort((a,b)=>b.wm-a.wm);
+    const st=bad.length>=2?'fire':bad.length>=1?'warn':'ok';
+    return{id:'D5',name:'Promo Discount Too Deep',status:st,
+      finding:bad.length?`<strong>${bad.length} SKU(s)</strong> with negative promo ROI. <strong>${bad[0].sku}</strong>: ${fmtPct(bad[0].depth)} discount, only ${fmtPct(bad[0].lift)} lift.`:`Promo discount depths appear calibrated to lift.`,
+      opp,metrics:[{l:'OVER-DISCOUNTED',v:bad.length,c:bad.length>1?'r':bad.length?'a':'g'},{l:'RECOVERABLE MARGIN',v:fmt$(opp),c:opp>0?'a':'g'},{l:'WORST DEPTH',v:bad[0]?fmtPct(bad[0].depth):'—',c:bad[0]&&bad[0].depth>20?'r':'a'}],
+      evidence:bad.length?{cols:['SKU','Discount %','Unit Lift','Recoverable Margin'],rows:bad.map(x=>[x.sku,fmtPct(x.depth),fmtPct(x.lift),fmt$(x.wm),x.depth>25?'ev-fire':'ev-warn']),note:'Promos where discount ROI is negative — sorted by recoverable margin'}:null};
+  })());
+
+  // D6 — SEASONAL MISS
+  res.push((()=>{
+    let holR=[],normR=[];
+    if(m.is_holiday_week){holR=rows.filter(r=>{const v=gs(r,'is_holiday_week',m).toUpperCase();return v==='TRUE'||v==='1'||v==='YES';});normR=rows.filter(r=>{const v=gs(r,'is_holiday_week',m).toUpperCase();return v==='FALSE'||v==='0'||v==='NO'||v===''||v==='FALSE';});}
+    else if(m.week){holR=rows.filter(r=>{const mo=parseInt((gs(r,'week',m).split('-')[1])||'0');return mo===11||mo===12||mo===7;});normR=rows.filter(r=>{const mo=parseInt((gs(r,'week',m).split('-')[1])||'0');return mo!==11&&mo!==12&&mo!==7;});}
+    else{const e=totRev*0.025;return{id:'D6',name:'Seasonal Peak Miss',status:'warn',finding:`Holiday flag and week columns missing.`,opp:e,metrics:[{l:'DATA',v:'Missing',c:'a'}]};}
+    if(!holR.length){return{id:'D6',name:'Seasonal Peak Miss',status:'ok',finding:`No holiday week data found in dataset.`,opp:0,metrics:[]};}
+    const hu=avg(holR,'units_sold',m)||0,nu=avg(normR,'units_sold',m)||0;
+    const lift=nu>0?(hu-nu)/nu*100:0;const holRev=sum(holR,'revenue',m);
+    const osaDrop=m.on_shelf_availability_pct?(avg(normR,'on_shelf_availability_pct',m)||0)-(avg(holR,'on_shelf_availability_pct',m)||0):0;
+    const missed=Math.max(0,30-lift);const opp=(holRev*(missed/100)+holRev*(Math.max(0,osaDrop)/100)*1.3)*gmpct/100;
+    const st=(osaDrop>3)||missed>15?'fire':missed>5||osaDrop>1?'warn':'ok';
+    const holOSA=m.on_shelf_availability_pct?(avg(holR,'on_shelf_availability_pct',m)||0):null;
+    const normOSA=m.on_shelf_availability_pct?(avg(normR,'on_shelf_availability_pct',m)||0):null;
+    const normRev=sum(normR,'revenue',m);
+    return{id:'D6',name:'Seasonal Peak Miss / Holiday OOS',status:st,
+      finding:missed>5?`Holiday lift: <strong>${fmtPct(lift)}</strong> vs ~30% CPG benchmark. ${osaDrop>2?`OSA drops <strong>${fmtPct(osaDrop)}</strong> during holiday weeks — stocking out at peak demand.`:''}`:`Holiday lift <strong>${fmtPct(lift)}</strong>. ${osaDrop>1?`OSA dips ${fmtPct(osaDrop)} in peak weeks.`:'Seasonal execution appears solid.'}`,
+      opp,metrics:[{l:'HOLIDAY LIFT',v:fmtPct(lift),c:lift>=25?'g':lift>=15?'a':'r'},{l:'OSA DROP IN HOLIDAY',v:osaDrop?fmtPct(osaDrop):'—',c:osaDrop>3?'r':osaDrop>1?'a':'g'},{l:'GP UPSIDE',v:fmt$(opp),c:opp>0?'a':'g'}],
+      evidence:{cols:['Period','Avg Units Sold','Avg OSA %','Revenue'],rows:[['Holiday weeks',hu.toFixed(1),holOSA!==null?fmtPct(holOSA):'—',fmt$(holRev),osaDrop>3?'ev-fire':osaDrop>1?'ev-warn':'ev-ok'],['Normal weeks',nu.toFixed(1),normOSA!==null?fmtPct(normOSA):'—',fmt$(normRev),'ev-ok']],note:'Holiday = Nov/Dec/Jul weeks or is_holiday_week flag'}};
+  })());
+
+  // D7 — LONG TAIL
+  res.push((()=>{
+    const bsku=by(rows,r=>gs(r,'sku',m));
+    const stats=Object.entries(bsku).map(([s,g])=>({s,rev:sum(g,'revenue',m),gp:sum(g,'gross_profit',m)})).sort((a,b)=>b.rev-a.rev);
+    const tot=stats.reduce((s,x)=>s+x.rev,0);let cum=0,n=0;
+    for(const x of stats){cum+=x.rev;n++;if(cum/tot>=0.8)break;}
+    const tail=stats.slice(n);const tailRev=tail.reduce((s,x)=>s+x.rev,0),tailGP=tail.reduce((s,x)=>s+x.gp,0);
+    const topGP=stats.slice(0,n).reduce((s,x)=>s+x.gp,0),topRev=stats.slice(0,n).reduce((s,x)=>s+x.rev,0);
+    const tpct=topRev>0?topGP/topRev*100:gmpct,tailpct=tailRev>0?tailGP/tailRev*100:gmpct;
+    const opp=tailRev>0&&tailpct<tpct-3?tailRev*(tpct-tailpct)/100:0;
+    const st=tail.length>=4&&tailpct<tpct-5?'fire':tail.length>=2?'warn':'ok';
+    return{id:'D7',name:'Long-Tail SKU Drag',status:st,
+      finding:tail.length?`Top <strong>${n} SKUs</strong> drive 80% of revenue. Remaining <strong>${tail.length} SKUs</strong> at ${fmtPct(tailpct)} margin vs ${fmtPct(tpct)} for top performers.`:`Portfolio well-concentrated. No long-tail drag.`,
+      opp,metrics:[{l:'80% REV IN TOP',v:n+' SKUs',c:'c'},{l:'TAIL COUNT',v:tail.length,c:tail.length>4?'r':tail.length>2?'a':'g'},{l:'MARGIN RECAPTURE',v:fmt$(opp),c:opp>0?'a':'g'}],
+      evidence:tail.length?{cols:['Rank','SKU','Revenue','Margin %'],rows:tail.map((x,i)=>[(n+i+1)+'',x.s,fmt$(x.rev),fmtPct(x.rev>0?x.gp/x.rev*100:0),tailpct<tpct-5?'ev-fire':'ev-warn']),note:`${tail.length} SKUs outside top-80% revenue cohort — rationalization candidates`}:null};
+  })());
+
+  // D8 — HOLIDAY OOS OVERLAP
+  res.push((()=>{
+    if(!m.on_shelf_availability_pct){const e=totRev*0.02;return{id:'D8',name:'Holiday Week OOS Overlap',status:'warn',finding:`Requires OSA + holiday/week columns.`,opp:e,metrics:[{l:'DATA',v:'Missing',c:'a'}]};}
+    let bad=[];
+    if(m.is_holiday_week){bad=rows.filter(r=>{const h=gs(r,'is_holiday_week',m).toUpperCase();const o=gn(r,'on_shelf_availability_pct',m);return(h==='TRUE'||h==='1'||h==='YES')&&o!==null&&o<92;});}
+    else if(m.week){bad=rows.filter(r=>{const mo=parseInt((gs(r,'week',m).split('-')[1])||'0');const o=gn(r,'on_shelf_availability_pct',m);return(mo===11||mo===12)&&o!==null&&o<92;});}
+    const skuCount=new Set(bad.map(r=>gs(r,'sku',m))).size;
+    const badRev=sum(bad,'revenue',m);const avgOOS=bad.length>0?100-avg(bad,'on_shelf_availability_pct',m):0;
+    const opp=badRev*(avgOOS/100)*1.3*gmpct/100;
+    const st=skuCount>=3?'fire':skuCount>=1?'warn':'ok';
+    const d8skuGrps=by(bad,r=>gs(r,'sku',m));
+    const d8evRows=Object.entries(d8skuGrps).map(([sku,g])=>{
+      const skuOSA=avg(g,'on_shelf_availability_pct',m)||0;
+      const skuOOS=100-skuOSA;const skuRev=sum(g,'revenue',m);
+      return[sku,fmtPct(skuOSA),fmtPct(skuOOS),fmt$(skuRev),skuOOS>10?'ev-fire':'ev-warn'];
+    }).sort((a,b)=>parseFloat(b[3].replace(/[$,KM]/g,''))-parseFloat(a[3].replace(/[$,KM]/g,'')));
+    return{id:'D8',name:'Holiday Week OOS Overlap',status:st,
+      finding:skuCount>0?`<strong>${skuCount} SKU(s)</strong> out-of-stock during holiday weeks. Permanently lost sales — consumers switch and don't return. ${fmt$(opp)} in estimated lost GP.`:`No significant OOS during holiday weeks. Inventory planning looks sound.`,
+      opp,metrics:[{l:'IMPACTED SKUS',v:skuCount,c:skuCount>2?'r':skuCount>0?'a':'g'},{l:'AVG OOS RATE',v:avgOOS?fmtPct(avgOOS):'—',c:avgOOS>5?'r':avgOOS>2?'a':'g'},{l:'PERM. LOST GP',v:fmt$(opp),c:opp>0?'r':'g'}],
+      evidence:d8evRows.length?{cols:['SKU','Avg OSA % (Holiday)','OOS Rate','Revenue Exposure'],rows:d8evRows,note:'SKUs with OSA below 92% during holiday weeks — sorted by revenue'}:null};
+  })());
+
+  // D9 — ASP EROSION
+  res.push((()=>{
+    if(!m.week||!m.avg_selling_price){const e=totRev*0.01;return{id:'D9',name:'ASP Erosion / Rollback Creep',status:'warn',finding:`Need week and avg_selling_price columns.`,opp:e,metrics:[{l:'DATA',v:'Missing',c:'a'}]};}
+    const sw=[...new Set(rows.map(r=>gs(r,'week',m)))].sort();const qs=Math.max(1,Math.floor(sw.length/4));
+    const q1=new Set(sw.slice(0,qs)),q4=new Set(sw.slice(-qs));
+    const q2=new Set(sw.slice(qs,2*qs)),q3=new Set(sw.slice(2*qs,3*qs));
+    const r1=rows.filter(r=>q1.has(gs(r,'week',m))),r4=rows.filter(r=>q4.has(gs(r,'week',m)));
+    const r2q=rows.filter(r=>q2.has(gs(r,'week',m))),r3q=rows.filter(r=>q3.has(gs(r,'week',m)));
+    const asp1=avg(r1,'avg_selling_price',m)||0,asp4=avg(r4,'avg_selling_price',m)||0;
+    const asp2=avg(r2q,'avg_selling_price',m)||0,asp3=avg(r3q,'avg_selling_price',m)||0;
+    const erosion=asp1>0?(asp1-asp4)/asp1*100:0;
+    const annRev=sum(r4,'revenue',m)*(52/qs);const opp=erosion>0?annRev*(erosion/100)*gmpct/100:0;
+    const msrpA=m.msrp?avg(rows,'msrp',m):null;const aspA=avg(rows,'avg_selling_price',m)||0;
+    const rollDepth=msrpA&&msrpA>0?(msrpA-aspA)/msrpA*100:0;
+    const st=erosion>3?'fire':erosion>1?'warn':'ok';
+    const d9aspPcts=[[asp1,0],[asp2,asp1],[asp3,asp2],[asp4,asp3]];
+    const d9evRows=d9aspPcts.map(([asp,prev],i)=>{
+      const chg=prev>0?(asp-prev)/prev*100:0;
+      const cls=asp<asp1*0.97?'ev-fire':asp<asp1*0.99?'ev-warn':'ev-ok';
+      return[`Q${i+1}`,'$'+asp.toFixed(2),(i===0?'—':(chg>=0?'+':'')+chg.toFixed(1)+'%'),cls];
+    });
+    return{id:'D9',name:'ASP Erosion / Rollback Creep',status:st,
+      finding:erosion>0.5?`Avg selling price drifted <strong>${fmtPct(erosion)}</strong> lower ($${asp1.toFixed(2)} → $${asp4.toFixed(2)}). ${rollDepth>5?`Currently ${fmtPct(rollDepth)} below MSRP — Walmart rollbacks may be normalizing below agreed floor.`:''}`:`Avg selling price stable ($${asp1.toFixed(2)} → $${asp4.toFixed(2)}). No rollback drift detected.`,
+      opp,metrics:[{l:'EARLY ASP',v:asp1?'$'+asp1.toFixed(2):'—',c:'c'},{l:'RECENT ASP',v:asp4?'$'+asp4.toFixed(2):'—',c:erosion>2?'r':'g'},{l:'EROSION',v:erosion>0?'-'+fmtPct(erosion):'+'+fmtPct(Math.abs(erosion)),c:erosion>2?'r':erosion>0.5?'a':'g'},{l:'GP IMPACT',v:fmt$(opp),c:opp>0?'a':'g'}],
+      evidence:{cols:['Period','Avg Selling Price','Period Change'],rows:d9evRows,note:'Quarterly ASP trend — Q1 is earliest, Q4 is most recent'}};
+  })());
+
+  // D10 — PHANTOM INVENTORY (NEW in v2)
+  res.push((()=>{
+    if(!m.on_shelf_availability_pct||!m.units_sold||!m.week){
+      return{id:'D10',name:'Phantom Inventory Risk',status:'ok',phantom:true,finding:`Requires OSA%, units_sold, and week columns to detect phantom inventory patterns.`,opp:0,metrics:[{l:'DATA',v:'Incomplete',c:'a'}]};}
+    const bskr=by(rows,r=>gs(r,'sku',m)+'|'+gs(r,'region',m));
+    let suspects=[],totalSuspectRev=0;
+    for(const[k,g]of Object.entries(bskr)){
+      const sorted=[...g].sort((a,b)=>gs(a,'week',m).localeCompare(gs(b,'week',m)));
+      if(sorted.length<6)continue;
+      // Look for: high OSA but declining velocity — phantom inventory signature
+      const half=Math.floor(sorted.length/2);
+      const early=sorted.slice(0,half),late=sorted.slice(half);
+      const earlyOSA=avg(early,'on_shelf_availability_pct',m)||0;
+      const lateOSA=avg(late,'on_shelf_availability_pct',m)||0;
+      const earlyU=avg(early,'units_sold',m)||0;
+      const lateU=avg(late,'units_sold',m)||0;
+      const velDrop=earlyU>0?(earlyU-lateU)/earlyU*100:0;
+      const osaDrop=earlyOSA-lateOSA;
+      // Phantom: OSA stays high (>90%) but units sold dropping significantly (>15%)
+      // and OSA not explaining the velocity drop (OSA stayed same or improved)
+      if(lateOSA>90&&velDrop>15&&osaDrop<3){
+        const suspectRev=sum(late,'revenue',m)*(velDrop/100);
+        totalSuspectRev+=suspectRev;
+        suspects.push({k,velDrop,lateOSA,earlyU,lateU,suspectRev});
+      }
+    }
+    suspects.sort((a,b)=>b.suspectRev-a.suspectRev);
+    const st=suspects.length>=3?'fire':suspects.length>=1?'warn':'ok';
+    const opp=totalSuspectRev*gmpct/100;
+    return{id:'D10',name:'Phantom Inventory Risk',status:st,phantom:true,
+      finding:suspects.length?`<strong>${suspects.length} SKU×Region combo(s)</strong> showing high reported OSA but declining velocity — the signature of phantom inventory. Store systems show product on-hand that isn't physically on the shelf. Worst: <strong>${suspects[0].k.replace('|',' / ')}</strong> — OSA ${fmtPct(suspects[0].lateOSA)} but units dropped ${fmtPct(suspects[0].velDrop)}.`:`No phantom inventory patterns detected. Reported OSA aligns with velocity trends.`,
+      opp,metrics:[{l:'SUSPECT COMBOS',v:suspects.length,c:suspects.length>2?'r':suspects.length>0?'a':'g'},{l:'VELOCITY DROP',v:suspects[0]?fmtPct(suspects[0].velDrop):'—',c:suspects[0]&&suspects[0].velDrop>25?'r':'a'},{l:'GP AT RISK',v:fmt$(opp),c:opp>0?'p':'g'},{l:'ACTION',v:'Request store audit',c:'p'}],
+      evidence:suspects.length?{cols:['SKU × Region','Velocity Drop','Late OSA %','GP at Risk'],rows:suspects.map(x=>[x.k.replace('|',' / '),fmtPct(x.velDrop),fmtPct(x.lateOSA),fmt$(x.suspectRev*gmpct/100),x.velDrop>25?'ev-fire':'ev-warn']),note:'High OSA but declining velocity — phantom inventory signature'}:null};
+  })());
+
+  return{results:res,totRev,totGP,totU,gmpct};
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// RUN + RENDER DIAGNOSTIC
+// ═══════════════════════════════════════════════════════════════════
+function runDiagnostic(){
+  const m=getMap();
+  if(!m.revenue&&!m.units_sold){toast('Map at least Revenue or Units Sold first.','err');return;}
+  loading('Running 10-point diagnostic…');
+  setTimeout(()=>{
+    try{
+      const{results,totRev,totGP,totU,gmpct}=runChecks(parsedData,m);
+      lastResults={results,totRev,totGP,totU,gmpct,ts:new Date().toISOString(),rows:parsedData.length};
+      renderDiagnostic(results,totRev,totGP,gmpct,parsedData.length);
+      loading(false);
+      document.getElementById('badge-diag').textContent='✓';
+      document.getElementById('badge-diag').className='nav-badge live';
+      showView('diagnostic');
+      toast(`Diagnostic complete — ${results.filter(r=>r.status==='fire').length} critical issues found`,'ok');
+    }catch(e){loading(false);toast('Error: '+e.message,'err');console.error(e);}
+  },60);
+}
+
+function renderDiagnostic(results,totRev,totGP,gmpct,rowCount){
+  const totOpp=results.reduce((s,r)=>s+r.opp,0);
+  const fires=results.filter(r=>r.status==='fire').length;
+  const warns=results.filter(r=>r.status==='warn').length;
+  document.getElementById('diagMeta').textContent=`${rowCount.toLocaleString()} rows analyzed · ${results.length} checks · ${new Date().toLocaleDateString()}`;
+
+  // Summary bar
+  const bar=document.getElementById('summaryBar');bar.style.display='grid';
+  bar.innerHTML=[
+    {val:fmt$(totRev),cls:'cyan',lbl:'Total Revenue'},
+    {val:fmtPct(gmpct),cls:'green',lbl:'Portfolio GM%'},
+    {val:fires,cls:fires>=3?'red':fires>=1?'amber':'green',lbl:'Critical Issues'},
+    {val:warns,cls:'amber',lbl:'Items to Review'},
+    {val:fmt$(totOpp),cls:'amber',lbl:'Est. Recoverable GP'},
+  ].map(s=>`<div class="stat-box"><div class="stat-val ${s.cls}">${s.val}</div><div class="stat-label">${s.lbl}</div></div>`).join('');
+
+  // Cards
+  const grid=document.getElementById('diagCards');grid.innerHTML='';
+  results.forEach((r,i)=>{
+    const pipCls=r.phantom?'pip-purple':r.status==='fire'?'pip-fire':r.status==='warn'?'pip-warn':'pip-ok';
+    const oppCls=r.phantom?'opp-purple':r.status==='fire'?'opp-fire':r.status==='warn'?'opp-warn':'opp-ok';
+    const cardCls=r.phantom?'diag-card phantom':`diag-card ${r.status}`;
+    const card=document.createElement('div');
+    card.className=cardCls+` fade-up d${Math.min(i+1,11)}`;
+    card.innerHTML=`<div class="diag-head"><div class="status-pip ${pipCls}"></div><span class="diag-id">#${i+1} ${r.id}</span><span class="diag-name">${r.name}</span><span class="diag-opp ${oppCls}">${r.opp>0?fmt$(r.opp):r.status==='ok'?'Healthy':'Review'}</span><span class="ev-hint">View data →</span></div>
+    <div class="diag-body"><div class="diag-finding">${r.finding}</div><div class="diag-metrics">${r.metrics.map(m=>`<div class="metric">${m.l}<span class="${m.c}">${m.v}</span></div>`).join('')}</div></div>`;
+    (()=>{const _i=i;card.onclick=()=>openEvidence(_i);})();
+    grid.appendChild(card);
+  });
+
+  // Ladder
+  const sorted=[...results].filter(r=>r.opp>0).sort((a,b)=>b.opp-a.opp);
+  const maxOpp=sorted[0]?.opp||1;
+  const colors=['#B91C1C','#92400E','#92400E','#152035','#152035','#15623E','#15623E','#374151','#374151','#6B7280'];
+  document.getElementById('ladderBody').innerHTML=sorted.map((r,i)=>`
+    <div class="ladder-item fade-up d${i+1}">
+      <div class="ladder-rank">${i+1}</div>
+      <div class="ladder-wrap">
+        <div class="ladder-lbl">${r.name}<span>${r.status.toUpperCase()}</span></div>
+        <div class="ladder-track"><div class="ladder-fill" style="width:${(r.opp/maxOpp*100).toFixed(1)}%;background:${colors[i]||'#00d4ff'}"></div></div>
+      </div>
+      <div class="ladder-val" style="color:${colors[i]||'#00d4ff'}">${fmt$(r.opp)}</div>
+    </div>`).join('')+`<div class="ladder-total"><div class="ladder-total-label">Total Estimated Recoverable GP</div><div class="ladder-total-val">${fmt$(totOpp)}</div></div>`;
+
+  document.getElementById('viewToggle').style.display='flex';
+  document.getElementById('diagActions').style.display='flex';
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// TREND MEMORY (localStorage persistence)
+// ═══════════════════════════════════════════════════════════════════
+function getSnaps(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');}catch{return[];}}
+function setSnaps(s){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(s));}catch{toast('Storage unavailable — run from a local server or browser with localStorage enabled.','err');}}
+
+function saveSnapshot(){
+  if(!lastResults){toast('Run the diagnostic first.','err');return;}
+  const snaps=getSnaps();
+  const snap={
+    ts:lastResults.ts,
+    label:new Date(lastResults.ts).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}),
+    totRev:lastResults.totRev,
+    totGP:lastResults.totGP,
+    gmpct:lastResults.gmpct,
+    totOpp:lastResults.results.reduce((s,r)=>s+r.opp,0),
+    fires:lastResults.results.filter(r=>r.status==='fire').length,
+    rows:lastResults.rows,
+    checks:lastResults.results.map(r=>({id:r.id,name:r.name,status:r.status,opp:r.opp}))
+  };
+  snaps.unshift(snap);
+  if(snaps.length>52)snaps.length=52; // keep rolling year
+  setSnaps(snaps);
+  toast('Snapshot saved to Trend Memory','ok');
+}
+
+function renderTrend(){
+  const snaps=getSnaps();
+  const el=document.getElementById('trendContent');
+  if(!snaps.length){
+    el.innerHTML=`<div class="card"><div class="card-body"><div class="trend-empty"><div class="trend-empty-icon">↗</div><div class="trend-empty-title">No snapshots yet</div><div class="trend-empty-sub">After running a diagnostic, click "Save Snapshot" to begin building your historical trend layer.<br><br>After 4+ snapshots, the engine will surface week-over-week deltas and trajectory charts.<br><br><em>This is the data Luminate doesn't keep for you.</em></div></div></div></div>`;
+    return;
+  }
+  const rev=snaps[0].totRev,prevRev=snaps[1]?.totRev;
+  const gp=snaps[0].totGP,prevGP=snaps[1]?.totGP;
+  const opp=snaps[0].totOpp,prevOpp=snaps[1]?.totOpp;
+  const fires=snaps[0].fires,prevFires=snaps[1]?.fires;
+  const delta=(a,b,inv=false)=>{if(!b)return{txt:'—',cls:'flat'};const d=(a-b)/Math.abs(b)*100;const up=inv?d<0:d>0;return{txt:(d>0?'↑':'↓')+Math.abs(d).toFixed(1)+'% WoW',cls:up?'up':'dn'};};
+  const dRev=delta(rev,prevRev);const dGP=delta(gp,prevGP);const dOpp=delta(opp,prevOpp,true);const dFires=delta(fires,prevFires,true);
+
+  let html=`<div class="trend-delta-grid" style="margin-bottom:20px;">`;
+  [{lbl:'Total Revenue',val:fmt$(rev),d:dRev},{lbl:'Gross Profit',val:fmt$(gp),d:dGP},{lbl:'Recoverable GP',val:fmt$(opp),d:dOpp,inv:true},{lbl:'Critical Issues',val:fires,d:dFires,inv:true}].forEach(x=>{
+    html+=`<div class="trend-delta-box"><div class="trend-delta-label">${x.lbl}</div><div class="trend-delta-val">${x.val}</div><div class="trend-delta-sub snap-delta ${x.d.cls}">${x.d.txt}</div></div>`;
+  });
+  html+=`</div>`;
+
+  // Mini bar chart of recoverable GP
+  if(snaps.length>=2){
+    const chartSnaps=[...snaps].reverse().slice(-12);
+    const maxO=Math.max(...chartSnaps.map(s=>s.totOpp))||1;
+    html+=`<div class="trend-chart"><div class="trend-chart-title">Recoverable GP — Last ${chartSnaps.length} Snapshots</div><div class="mini-chart">`;
+    chartSnaps.forEach(s=>{
+      const h=Math.max(4,(s.totOpp/maxO*72));
+      html+=`<div class="mini-bar-wrap"><div class="mini-bar" style="height:${h}px;background:var(--amber);opacity:0.7;"></div><div class="mini-bar-label">${s.label}</div></div>`;
+    });
+    html+=`</div></div>`;
+  }
+
+  // Snapshot list
+  html+=`<div class="card"><div class="card-header"><div class="card-title">Saved Snapshots</div><div class="card-desc">${snaps.length} of 52 weekly slots used</div></div><div class="card-body"><div class="snapshots-list">`;
+  snaps.forEach((s,i)=>{
+    const prev=snaps[i+1];
+    const oppDelta=prev?delta(s.totOpp,prev.totOpp,true):{txt:'—',cls:'flat'};
+    html+=`<div class="snapshot-row"><div class="snap-date">${s.label}</div><div class="snap-stats">
+      <div class="snap-stat">REVENUE<span>${fmt$(s.totRev)}</span></div>
+      <div class="snap-stat">GP%<span>${s.gmpct.toFixed(1)}%</span></div>
+      <div class="snap-stat">RECOVERABLE<span>${fmt$(s.totOpp)}</span></div>
+      <div class="snap-stat">CRITICAL<span>${s.fires}</span></div>
+    </div><div class="snap-delta ${oppDelta.cls}">${oppDelta.txt}</div>
+    <button class="snap-del" onclick="deleteSnap(${i})">✕</button></div>`;
+  });
+  html+=`</div></div></div>`;
+  html+=`<div class="btn-row" style="margin-top:12px;"><button class="btn btn-ghost" onclick="if(confirm('Clear all snapshots?'))clearSnaps()">✕ Clear All Snapshots</button></div>`;
+  el.innerHTML=html;
+}
+
+function deleteSnap(i){const s=getSnaps();s.splice(i,1);setSnaps(s);renderTrend();toast('Snapshot removed','ok');}
+function clearSnaps(){setSnaps([]);renderTrend();toast('All snapshots cleared','ok');}
+
+// ═══════════════════════════════════════════════════════════════════
+// JBP REPORT (buyer-facing language)
+// ═══════════════════════════════════════════════════════════════════
+const JBP_LANG={
+  D1:{title:'Category Availability Gap — OOS Compliance',frame:r=>`Walmart's category availability benchmark is 98% instock. ${r.finding.replace(/<[^>]+>/g,'').replace('Avg OSA:','Current portfolio OSA:')} An availability gap at this level creates shelf void risk and provides competitive items the opportunity to capture switching shoppers. Recommended JBP Action: Joint inventory build plan with agreed safety stock targets by SKU, targeting sustained OSA above 97%.`},
+  D2:{title:'Trade Spend Efficiency — Promotional ROI',frame:r=>`A credible JBP requires demonstration that promotional investments are generating incremental category contribution. ${r.finding.replace(/<[^>]+>/g,'')} Events generating sub-threshold lift represent trade dollars that could be redeployed into higher-ROI vehicles (feature display, price ladder optimization). Recommended JBP Action: Mutual agreement on promotional ROI floor — events must demonstrate minimum 12% incremental unit lift per point of discount depth.`},
+  D3:{title:'Distribution Opportunity — Velocity-Weighted Expansion',frame:r=>`Item velocity data reveals distribution gaps that represent incremental category growth without requiring new product introductions. ${r.finding.replace(/<[^>]+>/g,'')} Expanding distribution to velocity-equivalent levels across underperforming regions represents growth for both the supplier and the category. Recommended JBP Action: Targeted distribution expansion plan by region, with 90-day velocity benchmarks and buyer-agreed store count milestones.`},
+  D4:{title:'Portfolio Mix Optimization — Margin Architecture',frame:r=>`Category health depends on a sustainable margin architecture. ${r.finding.replace(/<[^>]+>/g,'')} A sustained mix shift toward lower-margin items reduces the supplier's ability to invest in category growth, innovation, and supply chain reliability. Recommended JBP Action: SKU rationalization review — align promotional support with items that maximize both volume and margin contribution.`},
+  D5:{title:'Promotional Pricing Architecture — Discount Depth Calibration',frame:r=>`EDLP (Everyday Low Price) principles require that promotional discount depth is calibrated to generate genuine incremental volume, not simply transfer baseline purchases at lower margins. ${r.finding.replace(/<[^>]+>/g,'')} Recommended JBP Action: Co-develop promotional ROI model using Luminate POS data — establish mutually-agreed discount depth guidelines by SKU segment.`},
+  D6:{title:'Seasonal Execution — Holiday & Peak Period Availability',frame:r=>`Peak seasonal periods represent a disproportionate share of annual category performance. ${r.finding.replace(/<[^>]+>/g,'')} Consumers who encounter stockouts during high-occasion weeks demonstrate lower brand loyalty in subsequent purchase cycles. Recommended JBP Action: Joint seasonal inventory build calendar — agree on build quantities and timing 8 weeks prior to each major holiday event.`},
+  D7:{title:'Portfolio Rationalization — SKU Productivity',frame:r=>`A productive assortment concentrates shelf space and supply chain capacity on highest-velocity items. ${r.finding.replace(/<[^>]+>/g,'')} Bottom-decile SKUs by velocity-per-door consume modular space that could be allocated to items with demonstrated consumer demand. Recommended JBP Action: Conduct joint SKU productivity review using Luminate modular metrics — target 10% reduction in tail SKU count with space reallocation to top performers.`},
+  D8:{title:'Holiday Season OOS — Critical Event Availability',frame:r=>`Holiday week out-of-stocks represent the highest-cost availability failure in CPG — permanently lost sales with documented consumer switching behavior. ${r.finding.replace(/<[^>]+>/g,'')} Research indicates 37% of holiday OOS shoppers switch to a competitive brand (GMA). Recommended JBP Action: Mandatory holiday safety stock agreement — pre-position inventory at DC level 4 weeks prior to Thanksgiving and Christmas peak windows.`},
+  D9:{title:'Pricing Integrity — Average Selling Price Management',frame:r=>`Average selling price integrity is foundational to both supplier margin health and the EDLP pricing architecture Walmart's shoppers depend on. ${r.finding.replace(/<[^>]+>/g,'')} Uncontrolled rollback drift erodes the supplier's ability to invest in innovation and supply chain capabilities that benefit category performance. Recommended JBP Action: Establish ASP floor agreements by SKU — monthly ASP monitoring with joint review if ASP drops more than 3% from agreed baseline.`},
+  D10:{title:'On-Shelf Availability Accuracy — Phantom Inventory Audit',frame:r=>`Phantom inventory — system-reported stock that does not exist on the physical shelf — creates a gap between reported OSA and actual shopper availability. ${r.finding.replace(/<[^>]+>/g,'')} This is a systemic issue requiring store-level inventory auditing and replenishment trigger recalibration. Recommended JBP Action: Request targeted store-level inventory audit in flagged regions; review "Traited Status" and replenishment cycle settings in GRS for affected items.`},
+};
+
+function buildJBP(){
+  if(!lastResults){return;}
+  const{results,totRev,totGP,gmpct,ts}=lastResults;
+  const totOpp=results.reduce((s,r)=>s+r.opp,0);
+  const fires=results.filter(r=>r.status==='fire');
+  const warns=results.filter(r=>r.status==='warn');
+  const topOpp=[...results].filter(r=>r.opp>0).sort((a,b)=>b.opp-a.opp).slice(0,3);
+  const date=new Date(ts).toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+  const snaps=getSnaps();const hasHistory=snaps.length>=2;
+
+  let html=`<div class="jbp-panel">
+    <div class="jbp-header">
+      <div class="jbp-logo">Confidential — Joint Business Plan Briefing Document</div>
+      <div class="jbp-title">Channel Performance & Growth Opportunity Review</div>
+      <div class="jbp-meta">Walmart Channel · Generated ${date} · Crestline Method Diagnostic v2.0</div>
+    </div>
+    <div class="jbp-body">
+
+      <div class="jbp-section">
+        <div class="jbp-section-title">Executive Summary</div>
+        <p style="font-size:12px;color:var(--muted2);line-height:1.8;">This analysis covers <strong style="color:var(--text)">${lastResults.rows.toLocaleString()} weeks of POS data</strong> representing <strong style="color:var(--text)">${fmt$(totRev)}</strong> in channel revenue at a portfolio gross margin of <strong style="color:var(--text)">${fmtPct(gmpct)}</strong>. The diagnostic identified <strong style="color:var(--red)">${fires.length} critical areas</strong> and <strong style="color:var(--amber)">${warns.length} items for joint review</strong>. Total estimated recoverable gross profit through identified opportunities: <strong style="color:var(--amber)">${fmt$(totOpp)}</strong>.</p>
+        ${hasHistory?`<p style="font-size:11px;color:var(--muted2);margin-top:10px;font-style:italic;">Note: This briefing is supported by ${snaps.length} weeks of historical trend data maintained in the Crestline data custody layer. This historical dataset is independently maintained and provides continuity beyond Luminate's rolling data windows.</p>`:''}
+      </div>`;
+
+  // DSS Migration callout
+  html+=`<div class="jbp-section"><div class="jbp-section-title">Data Infrastructure Note</div>
+    <div class="jbp-dss-box">
+      <div class="jbp-dss-title">Automated Reporting — DSS Migration</div>
+      <div class="jbp-dss-text">This diagnostic replaces the manual Retail Link / DSS reporting workflows that were discontinued in Q2 2024. All metrics in this briefing are refreshed automatically from Luminate POS data exports — eliminating the manual Excel pivot process and ensuring the buyer conversation is always supported by current data. Reporting cadence: weekly refresh, available every Monday morning.</div>
+    </div>
+  </div>`;
+
+  // Critical findings in JBP language
+  if(fires.length){
+    html+=`<div class="jbp-section"><div class="jbp-section-title">Priority Action Items — Requires Joint Resolution</div>`;
+    fires.forEach(r=>{
+      const lang=JBP_LANG[r.id];if(!lang)return;
+      html+=`<div class="jbp-finding fire"><div class="jbp-finding-head"><div class="jbp-finding-name">${lang.title}</div><div class="jbp-finding-opp">${r.opp>0?fmt$(r.opp)+' GP opportunity':''}</div></div><div class="jbp-finding-text">${lang.frame(r)}</div></div>`;
+    });
+    html+=`</div>`;
+  }
+
+  if(warns.length){
+    html+=`<div class="jbp-section"><div class="jbp-section-title">Secondary Review Items</div>`;
+    warns.forEach(r=>{
+      const lang=JBP_LANG[r.id];if(!lang)return;
+      html+=`<div class="jbp-finding warn"><div class="jbp-finding-head"><div class="jbp-finding-name">${lang.title}</div><div class="jbp-finding-opp">${r.opp>0?fmt$(r.opp)+' GP opportunity':''}</div></div><div class="jbp-finding-text">${lang.frame(r)}</div></div>`;
+    });
+    html+=`</div>`;
+  }
+
+  // Recommended JBP commitments
+  html+=`<div class="jbp-section"><div class="jbp-section-title">Proposed Joint Commitments — ${new Date().getFullYear()} JBP</div>`;
+  topOpp.forEach((r,i)=>{
+    const lang=JBP_LANG[r.id];if(!lang)return;
+    const commitText=lang.frame(r).split('Recommended JBP Action:')[1]?.trim()||'See findings above.';
+    html+=`<div class="jbp-commitment"><div class="jbp-commit-num">${i+1}.</div><div class="jbp-commit-body"><div class="jbp-commit-title">${lang.title}</div><div class="jbp-commit-text">${commitText} Estimated GP impact if resolved: <strong style="color:var(--amber)">${fmt$(r.opp)}</strong>.</div></div></div>`;
+  });
+  html+=`</div>`;
+
+  // OTIF if filled in
+  const otifPO=parseFloat(document.getElementById('otifPO').value)||0;
+  const otifScore=parseFloat(document.getElementById('otifScore').value)||0;
+  if(otifPO&&otifScore){
+    const miss=(100-otifScore)/100;const exp=otifPO*miss*0.03;
+    html+=`<div class="jbp-section"><div class="jbp-section-title">OTIF Compliance — Chargeback Exposure</div>
+    <div class="jbp-finding fire"><div class="jbp-finding-head"><div class="jbp-finding-name">OTIF Performance — Active Chargeback Position</div><div class="jbp-finding-opp">${fmt$(exp)}/year exposure</div></div>
+    <div class="jbp-finding-text">Current OTIF performance of ${otifScore}% against Walmart's 98% benchmark generates an estimated ${fmt$(exp)} in annual chargeback penalties (3% of applicable PO value). This represents a direct P&L impact independent of sales performance. Recommended JBP Action: Establish a joint OTIF improvement roadmap with 90-day milestones — targeting 97%+ OTIF within two quarters through forecast accuracy improvement and DC replenishment cycle optimization.</div></div></div>`;
+  }
+
+  html+=`</div></div>`; // close jbp-body, jbp-panel
+  document.getElementById('jbpContent').innerHTML=html;
+  document.getElementById('jbpActions').style.display='flex';
+  document.getElementById('badge-jbp')?.remove();
+}
+
+function copyJBP(){
+  const el=document.getElementById('jbpContent');
+  const text=el.innerText||el.textContent;
+  navigator.clipboard.writeText(text).then(()=>toast('JBP report copied to clipboard','ok'));
+}
+
+// Override showView to build JBP when navigating there
+const _origShowView=showView;
+window.showView=function(id){
+  _origShowView(id);
+  if(id==='jbp'&&lastResults)buildJBP();
+};
+
+// ═══════════════════════════════════════════════════════════════════
+// SAMPLE DATA
+// ═══════════════════════════════════════════════════════════════════
+function loadSample(){
+  loading('Generating Crestline sample data…');
+  setTimeout(()=>{
+    const skus=[
+      {s:'CLF-001',n:'Original Trail Mix 8oz',seg:'Trail Mix',msrp:4.98,cost:2.10,vel:14,osa:97},
+      {s:'CLF-002',n:'Deluxe Nut Blend 10oz',seg:'Nut Blends',msrp:6.48,cost:2.85,vel:10,osa:96},
+      {s:'CLF-004',n:'Honey Almond Crunch 12oz',seg:'Nut Blends',msrp:7.98,cost:3.40,vel:11,osa:97},
+      {s:'CLF-007',n:'Keto Seed Mix 5oz',seg:'Specialty',msrp:5.98,cost:2.60,vel:5,osa:91},
+      {s:'CLF-011',n:'Sriracha Cashews 8oz',seg:'Specialty',msrp:5.98,cost:2.55,vel:3,osa:86},
+    ];
+    const regs=[
+      {r:'South Central',st:312},{r:'Southeast',st:287},{r:'Midwest',st:341},{r:'Northwest',st:112}
+    ];
+    const hols=new Set(['2024-02-04','2024-05-19','2024-11-24','2024-12-15','2023-11-19','2023-12-17']);
+    const pros=new Set(['2024-01-07','2024-05-05','2024-11-03','2024-11-24','2023-11-05','2023-11-19']);
+    const rows=['Week,Year,Month,Quarter,Is_Holiday_Week,Is_Promo_Week,SKU,Product_Name,Segment,Region,Num_Stores,Units_Sold,Avg_Selling_Price,MSRP,Revenue,COGS,Gross_Profit,Gross_Margin_Pct,On_Shelf_Availability_Pct,Promo_Flag'];
+    const weeks=[];let d=new Date('2023-01-01');
+    for(let i=0;i<60;i++){weeks.push(d.toISOString().split('T')[0]);d.setDate(d.getDate()+7);}
+    const rnd=(a,b)=>a+Math.random()*(b-a);
+    skus.forEach(sk=>{
+      regs.forEach(rg=>{
+        // Phantom inventory simulation for CLF-007 in Northwest — high OSA but declining units
+        const isPhantomCandidate=(sk.s==='CLF-007'&&rg.r==='Northwest');
+        weeks.forEach((wk,wi)=>{
+          const isH=hols.has(wk),isP=pros.has(wk);
+          let osaBase=sk.osa;
+          if(isH)osaBase*=(sk.s==='CLF-011'?0.88:0.95);
+          const osa=Math.min(99.5,osaBase*rnd(0.97,1.01));
+          // Phantom: OSA stays high but velocity drops in second half
+          let velMult=1;
+          if(isPhantomCandidate&&wi>30)velMult=rnd(0.55,0.70); // drops ~40% but OSA stays high
+          const units=Math.round(sk.vel*rg.st*(isH?1.3:1)*(isP?1.4:1)*velMult*rnd(0.9,1.1)*(osa/100));
+          const price=sk.msrp*(isP?rnd(0.84,0.92):rnd(0.94,0.99));
+          const rev=Math.round(units*price*100)/100;
+          const cogs=Math.round(units*sk.cost*100)/100;
+          const gp=Math.round((rev-cogs)*100)/100;
+          const gmpct=rev>0?Math.round(gp/rev*1000)/10:0;
+          const mo=wk.slice(5,7);const yr=wk.slice(0,4);
+          const q='Q'+Math.ceil(parseInt(mo)/3);
+          rows.push([wk,yr,mo,q,isH,isP,sk.s,sk.n,sk.seg,rg.r,rg.st,units,
+            Math.round(price*100)/100,sk.msrp,rev,cogs,gp,gmpct,
+            Math.round(osa*10)/10,isP?'Y':'N'].join(','));
+        });
+      });
+    });
+    const csv=rows.join('\n');
+    document.getElementById('csvPaste').value=csv;
+    loading(false);
+    process(csv);
+  },80);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// EXPORT
+// ═══════════════════════════════════════════════════════════════════
+function exportCSV(){
+  if(!lastResults)return;
+  let csv='Check,Name,Status,Est GP Opportunity,Finding\n';
+  lastResults.results.forEach(r=>{
+    csv+=`${r.id},"${r.name}",${r.status.toUpperCase()},"${fmt$(r.opp)}","${r.finding.replace(/<[^>]+>/g,'').replace(/,/g,' ')}"\n`;
+  });
+  const otifPO=parseFloat(document.getElementById('otifPO').value)||0;
+  const otifScore=parseFloat(document.getElementById('otifScore').value)||0;
+  if(otifPO&&otifScore){const exp=otifPO*((100-otifScore)/100)*0.03;csv+=`OTIF,"OTIF Chargeback Exposure",ACTIVE,"${fmt$(exp)}","Annual chargeback at ${otifScore}% OTIF"\n`;}
+  const b=new Blob([csv],{type:'text/csv'});const a=document.createElement('a');a.href=URL.createObjectURL(b);
+  a.download=`CPG_Diagnostic_${new Date().toISOString().split('T')[0]}.csv`;a.click();
+  toast('CSV exported','ok');
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// UI HELPERS
+// ═══════════════════════════════════════════════════════════════════
+function loading(msg){const o=document.getElementById('loader');if(msg){document.getElementById('loaderTxt').textContent=msg;o.classList.add('on');}else o.classList.remove('on');}
+function toast(msg,type=''){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast on ${type}`;setTimeout(()=>t.classList.remove('on'),3500);}
+
+// ═══════════════════════════════════════════════════════════════════
+// EVIDENCE PANEL
+// ═══════════════════════════════════════════════════════════════════
+function openEvidence(idx){
+  const r=lastResults&&lastResults.results&&lastResults.results[idx];
+  if(!r)return;
+  const statusLabel=r.status==='fire'?'Critical Issue':r.status==='warn'?'Review Item':'Healthy';
+  document.getElementById('evCheckId').textContent=r.id+' — '+statusLabel;
+  document.getElementById('evCheckName').textContent=r.name;
+  document.getElementById('evFinding').innerHTML=r.finding;
+  const wrap=document.getElementById('evTableWrap');
+  if(!r.evidence||!r.evidence.rows||!r.evidence.rows.length){
+    wrap.innerHTML='<div class="ev-section-label">Supporting Data</div><div class="ev-empty">No material issues detected for this check.<br>All items are within expected thresholds.</div>';
+    document.getElementById('evNote').textContent='';
+    document.getElementById('evRowCount').textContent='';
+  }else{
+    const ev=r.evidence;
+    const ths=ev.cols.map(c=>`<th>${c}</th>`).join('');
+    const trs=ev.rows.map(row=>{
+      const last=row[row.length-1];
+      const hasCls=typeof last==='string'&&last.startsWith('ev-');
+      const vals=hasCls?row.slice(0,-1):row;
+      const cls=hasCls?last:'';
+      return`<tr>${vals.map((v,i)=>`<td class="${i===1&&cls?cls:''}">${v}</td>`).join('')}</tr>`;
+    }).join('');
+    wrap.innerHTML=`<div class="ev-section-label">Supporting Data</div><table class="ev-table"><thead><tr>${ths}</tr></thead><tbody>${trs}</tbody></table>`;
+    document.getElementById('evNote').textContent=ev.note||'';
+    document.getElementById('evRowCount').textContent=ev.rows.length+' row'+(ev.rows.length!==1?'s':'');
+  }
+  document.getElementById('evBackdrop').classList.add('open');
+  document.getElementById('evidencePanel').classList.add('open');
+}
+function closeEvidence(){
+  document.getElementById('evBackdrop').classList.remove('open');
+  document.getElementById('evidencePanel').classList.remove('open');
+}
+
+// Drag-drop
+const dz=document.getElementById('dropZone');
+dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('over');});
+dz.addEventListener('dragleave',()=>dz.classList.remove('over'));
+dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('over');const f=e.dataTransfer.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>process(ev.target.result);r.readAsText(f);});
+document.getElementById('fileInput').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>process(ev.target.result);r.readAsText(f);});
+</script>
+
+<div class="evidence-backdrop" id="evBackdrop" onclick="closeEvidence()"></div>
+<div class="evidence-panel" id="evidencePanel">
+  <div class="ev-header">
+    <div class="ev-header-info">
+      <div class="ev-check-id" id="evCheckId"></div>
+      <div class="ev-check-name" id="evCheckName"></div>
+    </div>
+    <button class="ev-close" onclick="closeEvidence()">&#x2715;</button>
+  </div>
+  <div class="ev-finding" id="evFinding"></div>
+  <div class="ev-table-wrap" id="evTableWrap"></div>
+  <div class="ev-footer">
+    <span id="evNote"></span>
+    <span id="evRowCount" style="color:var(--navy);font-weight:600;"></span>
+  </div>
+</div>
+</body>
+</html>
