@@ -111,7 +111,7 @@ body {
 .logo-text { flex: 1; }
 .logo-word {
   font-family: var(--serif);
-  font-size: 16px;
+  font-size: 13px;
   font-weight: 700;
   color: var(--navy);
   letter-spacing: -0.01em;
@@ -1086,8 +1086,7 @@ textarea:focus, select:focus, input:focus { box-shadow: none; }
 <aside class="sidebar">
   <div class="logo">
     <div class="logo-text">
-      <div class="logo-word">Jake's CPG Margin <span class="logo-ver">v2</span></div>
-      <div class="logo-sub">Diagnostic Tool</div>
+      <div class="logo-word">Jake's CPG Margin Diagnostic Tool <span class="logo-ver">v2</span></div>
     </div>
   </div>
   <nav class="nav">
@@ -1274,7 +1273,7 @@ textarea:focus, select:focus, input:focus { box-shadow: none; }
   <div class="page-header">
     <div class="page-eyebrow">New in v2 — JBP Output Mode</div>
     <div class="page-title">Joint Business Plan Report</div>
-    <div class="page-desc">Buyer-facing language. Run the diagnostic first, then generate this to turn audit findings into a JBP-ready narrative your client can hand directly to their Walmart buyer.</div>
+    <div class="page-desc">Run the diagnostic first, then generate this to turn your findings into a structured, buyer-ready narrative you can bring directly into your Walmart JBP conversation.</div>
   </div>
   <div id="jbpContent">
     <div class="card">
@@ -1912,16 +1911,9 @@ function buildJBP(){
       <div class="jbp-section">
         <div class="jbp-section-title">Executive Summary</div>
         <p style="font-size:12px;color:var(--muted2);line-height:1.8;">This analysis covers <strong style="color:var(--text)">${lastResults.rows.toLocaleString()} weeks of POS data</strong> representing <strong style="color:var(--text)">${fmt$(totRev)}</strong> in channel revenue at a portfolio gross margin of <strong style="color:var(--text)">${fmtPct(gmpct)}</strong>. The diagnostic identified <strong style="color:var(--red)">${fires.length} critical areas</strong> and <strong style="color:var(--amber)">${warns.length} items for joint review</strong>. Total estimated recoverable gross profit through identified opportunities: <strong style="color:var(--amber)">${fmt$(totOpp)}</strong>.</p>
-        ${hasHistory?`<p style="font-size:11px;color:var(--muted2);margin-top:10px;font-style:italic;">Note: This briefing is supported by ${snaps.length} weeks of historical trend data maintained in the diagnostic data custody layer. This historical dataset is independently maintained and provides continuity beyond Luminate's rolling data windows.</p>`:''}
+        ${hasHistory?`<p style="font-size:11px;color:var(--muted2);margin-top:10px;font-style:italic;">Note: This briefing includes ${snaps.length} weeks of historical trend data, providing broader context beyond a single-period snapshot.</p>`:''}
       </div>`;
 
-  // DSS Migration callout
-  html+=`<div class="jbp-section"><div class="jbp-section-title">Data Infrastructure Note</div>
-    <div class="jbp-dss-box">
-      <div class="jbp-dss-title">Automated Reporting — DSS Migration</div>
-      <div class="jbp-dss-text">This diagnostic replaces the manual Retail Link / DSS reporting workflows that were discontinued in Q2 2024. All metrics in this briefing are refreshed automatically from Luminate POS data exports — eliminating the manual Excel pivot process and ensuring the buyer conversation is always supported by current data. Reporting cadence: weekly refresh, available every Monday morning.</div>
-    </div>
-  </div>`;
 
   // Critical findings in JBP language
   if(fires.length){
